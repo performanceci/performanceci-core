@@ -21,3 +21,4 @@ log/*
 tmp
 .rbenv*
 notes
+run.sh

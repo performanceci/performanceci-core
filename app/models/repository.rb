@@ -20,7 +20,7 @@ class Repository < ActiveRecord::Base
     {
       #TODO: Config
       #TODO: Generate random id instead of user id
-      url: "http://ee75d51.ngrok.com/webhooks/#{user.id}",
+      url: "#{ENV['WEBHOOK_URL']}/webhooks/#{user.id}",
       content_type: 'json'
     }
   end
