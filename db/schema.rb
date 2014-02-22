@@ -16,6 +16,9 @@ ActiveRecord::Schema.define(version: 20140222052348) do
   create_table "repositories", force: true do |t|
     t.string   "name"
     t.text     "url"
+    t.integer  "github_id"
+    t.integer  "user_id"
+    t.string   "hook_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

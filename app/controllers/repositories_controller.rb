@@ -14,7 +14,7 @@ class RepositoriesController < ApplicationController
 
   # GET /repositories/new
   def new
-    @repositories = github_client.repos
+    @repositories = current_user.github_client.repos
   end
 
   # GET /repositories/1/edit
@@ -24,7 +24,7 @@ class RepositoriesController < ApplicationController
   # POST /repositories
   # POST /repositories.json
   def create
-    @repository = Repository.new(repository_params)
+    @repository = Repository.new(name: params[:name], user: current_user)
 
     respond_to do |format|
       if @repository.save
@@ -69,10 +69,7 @@ class RepositoriesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def repository_params
-      params.require(:repository).permit(:name, :url)
+      params.permit(:name, :url)
     end
 
-    def github_client
-      Octokit::Client.new :access_token => current_user.github_oauth_token
-    end
 end

@@ -4,6 +4,8 @@ class CreateRepositories < ActiveRecord::Migration
       t.string :name
       t.text :url
       t.integer :github_id
+      t.integer :user_id
+      t.string :hook_id
 
       t.timestamps
     end

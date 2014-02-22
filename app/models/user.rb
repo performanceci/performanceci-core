@@ -35,4 +35,8 @@ class User < ActiveRecord::Base
     }
   end
 
+  def github_client
+    Octokit::Client.new :access_token => github_oauth_token
+  end
+
 end
