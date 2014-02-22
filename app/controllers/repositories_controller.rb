@@ -14,15 +14,8 @@ class RepositoriesController < ApplicationController
   end
 
   def summary
-    respond_to do |format|
-      if @repository.save
-        format.html { redirect_to @repository, notice: 'Repository was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @repository }
-      else
-        format.html { render action: 'new' }
-        format.json { render json: @repository.errors, status: :unprocessable_entity }
-      end
-    end
+    @repository = current_user.repositories.find(params[:id])
+    render json: @repository.build_summary
   end
 
   # GET /repositories/new

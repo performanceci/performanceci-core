@@ -5,7 +5,11 @@ Performanceci::Application.routes.draw do
 
   resources :builds
 
-  resources :repositories
+  resources :repositories do
+    member do
+      get 'summary'
+    end
+  end
 
   resources :results_overview
 
