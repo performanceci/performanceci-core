@@ -1,0 +1,37 @@
+<%= form_for(@endpoint) do |f| %>
+  <% if @endpoint.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@endpoint.errors.count, "error") %> prohibited this endpoint from being saved:</h2>
+
+      <ul>
+      <% @endpoint.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :url %><br>
+    <%= f.text_area :url %>
+  </div>
+  <div class="field">
+    <%= f.label :headers %><br>
+    <%= f.text_area :headers %>
+  </div>
+  <div class="field">
+    <%= f.label :repository_id %><br>
+    <%= f.number_field :repository_id %>
+  </div>
+  <div class="field">
+    <%= f.label :benchmark_type %><br>
+    <%= f.text_field :benchmark_type %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

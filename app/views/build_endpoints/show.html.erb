@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Endpoint:</strong>
+  <%= @build_endpoint.endpoint_id %>
+</p>
+
+<p>
+  <strong>Build:</strong>
+  <%= @build_endpoint.build_id %>
+</p>
+
+<p>
+  <strong>Data:</strong>
+  <%= @build_endpoint.data %>
+</p>
+
+<p>
+  <strong>Response time:</strong>
+  <%= @build_endpoint.response_time %>
+</p>
+
+<p>
+  <strong>Score:</strong>
+  <%= @build_endpoint.score %>
+</p>
+
+<p>
+  <strong>Screenshot:</strong>
+  <%= @build_endpoint.screenshot %>
+</p>
+
+<%= link_to 'Edit', edit_build_endpoint_path(@build_endpoint) %> |
+<%= link_to 'Back', build_endpoints_path %>

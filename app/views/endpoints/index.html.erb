@@ -1,0 +1,35 @@
+<h1>Listing endpoints</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Url</th>
+      <th>Headers</th>
+      <th>Repository</th>
+      <th>Benchmark type</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @endpoints.each do |endpoint| %>
+      <tr>
+        <td><%= endpoint.name %></td>
+        <td><%= endpoint.url %></td>
+        <td><%= endpoint.headers %></td>
+        <td><%= endpoint.repository_id %></td>
+        <td><%= endpoint.benchmark_type %></td>
+        <td><%= link_to 'Show', endpoint %></td>
+        <td><%= link_to 'Edit', edit_endpoint_path(endpoint) %></td>
+        <td><%= link_to 'Destroy', endpoint, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Endpoint', new_endpoint_path %>

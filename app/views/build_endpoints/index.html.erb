@@ -1,0 +1,37 @@
+<h1>Listing build_endpoints</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>Build</th>
+      <th>Data</th>
+      <th>Response time</th>
+      <th>Score</th>
+      <th>Screenshot</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @build_endpoints.each do |build_endpoint| %>
+      <tr>
+        <td><%= build_endpoint.endpoint_id %></td>
+        <td><%= build_endpoint.build_id %></td>
+        <td><%= build_endpoint.data %></td>
+        <td><%= build_endpoint.response_time %></td>
+        <td><%= build_endpoint.score %></td>
+        <td><%= build_endpoint.screenshot %></td>
+        <td><%= link_to 'Show', build_endpoint %></td>
+        <td><%= link_to 'Edit', edit_build_endpoint_path(build_endpoint) %></td>
+        <td><%= link_to 'Destroy', build_endpoint, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Build endpoint', new_build_endpoint_path %>

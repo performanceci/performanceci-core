@@ -1,0 +1,41 @@
+<%= form_for(@build_endpoint) do |f| %>
+  <% if @build_endpoint.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@build_endpoint.errors.count, "error") %> prohibited this build_endpoint from being saved:</h2>
+
+      <ul>
+      <% @build_endpoint.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :endpoint_id %><br>
+    <%= f.number_field :endpoint_id %>
+  </div>
+  <div class="field">
+    <%= f.label :build_id %><br>
+    <%= f.number_field :build_id %>
+  </div>
+  <div class="field">
+    <%= f.label :data %><br>
+    <%= f.text_area :data %>
+  </div>
+  <div class="field">
+    <%= f.label :response_time %><br>
+    <%= f.text_field :response_time %>
+  </div>
+  <div class="field">
+    <%= f.label :score %><br>
+    <%= f.number_field :score %>
+  </div>
+  <div class="field">
+    <%= f.label :screenshot %><br>
+    <%= f.text_area :screenshot %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

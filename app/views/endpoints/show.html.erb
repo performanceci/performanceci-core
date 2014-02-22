@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @endpoint.name %>
+</p>
+
+<p>
+  <strong>Url:</strong>
+  <%= @endpoint.url %>
+</p>
+
+<p>
+  <strong>Headers:</strong>
+  <%= @endpoint.headers %>
+</p>
+
+<p>
+  <strong>Repository:</strong>
+  <%= @endpoint.repository_id %>
+</p>
+
+<p>
+  <strong>Benchmark type:</strong>
+  <%= @endpoint.benchmark_type %>
+</p>
+
+<%= link_to 'Edit', edit_endpoint_path(@endpoint) %> |
+<%= link_to 'Back', endpoints_path %>

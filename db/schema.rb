@@ -11,7 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140222082019) do
+ActiveRecord::Schema.define(version: 20140222191154) do
+
+  create_table "build_endpoints", force: true do |t|
+    t.integer  "endpoint_id"
+    t.integer  "build_id"
+    t.text     "data"
+    t.float    "response_time"
+    t.integer  "score"
+    t.text     "screenshot"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "builds", force: true do |t|
     t.string   "ref"
@@ -22,6 +33,16 @@ ActiveRecord::Schema.define(version: 20140222082019) do
     t.text     "payload"
     t.text     "url"
     t.string   "author"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "endpoints", force: true do |t|
+    t.string   "name"
+    t.text     "url"
+    t.text     "headers"
+    t.integer  "repository_id"
+    t.string   "benchmark_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

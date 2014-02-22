@@ -1,4 +1,8 @@
 Performanceci::Application.routes.draw do
+  resources :build_endpoints
+
+  resources :endpoints
+
   resources :builds
 
   resources :repositories
