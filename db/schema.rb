@@ -35,6 +35,9 @@ ActiveRecord::Schema.define(version: 20140222232930) do
     t.string   "author"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "build_status"
+    t.string   "docker_image_id"
+    t.string   "docker_container_id"
   end
 
   create_table "endpoints", force: true do |t|
@@ -47,14 +50,17 @@ ActiveRecord::Schema.define(version: 20140222232930) do
     t.integer  "concurrency"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "order"
     t.integer  "max_response_time"
+    t.integer  "order"
   end
 
   create_table "repositories", force: true do |t|
     t.string   "name"
+    t.string   "full_name"
     t.text     "url"
     t.integer  "github_id"
+    t.integer  "user_id"
+    t.string   "hook_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
