@@ -3,6 +3,7 @@ class Repository < ActiveRecord::Base
   before_create :add_hook
 
   has_many :endpoints
+  has_many :builds
 
   def add_hook
     #repo = user.github_client.repos.find { |r| r.name == name}
@@ -14,6 +15,12 @@ class Repository < ActiveRecord::Base
     )
     self.hook_id = hook.id
     hook.id.present?
+  end
+
+  def build_summary
+    builds = self.builds.order('created_at desc').limit(20).includes(:build_endpoints)
+    build_endpoints = builds.flat_map { |b| b.build_endpoints }
+    grouped_endpoints = build_endpoints.group_by { |be| be.endpoint }
   end
 
   private
