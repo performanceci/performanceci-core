@@ -1,4 +1,4 @@
-require_relative 'worker/worker'
+require_relative 'Worker/worker'
 
 class KillaBeez < Worker
     include Resque::Plugins::Status
@@ -7,7 +7,7 @@ class KillaBeez < Worker
         at(0, 1, "Sleepy Beez")
         cmd = options['cmd']
 
-        Worker.system_quietly("#{cmd}") 
+        Worker.system_quietly("#{cmd}")
         puts "done"
     end
 end
