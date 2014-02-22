@@ -22,3 +22,8 @@ tmp
 .rbenv*
 notes
 run.sh
+
+#stuff for vim
+*~
+*.swp
+*.swo
