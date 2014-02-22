@@ -2,6 +2,8 @@ class Repository < ActiveRecord::Base
   belongs_to :user
   before_create :add_hook
 
+  has_many :endpoints
+
   def add_hook
     #repo = user.github_client.repos.find { |r| r.name == name}
     hook = user.github_client.create_hook(
