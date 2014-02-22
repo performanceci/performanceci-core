@@ -15,6 +15,7 @@ class RepositoriesController < ApplicationController
   # GET /repositories/new
   def new
     @repositories = current_user.github_client.repos
+    @current_repositories = current_user.repositories
   end
 
   # GET /repositories/1/edit

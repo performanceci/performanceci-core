@@ -11,10 +11,14 @@
                   <% @repositories.each do |repo| %>
                   <tr>
                       <td><%= repo.full_name %></td>
-                      <td><%= link_to 'Add',
-                        repositories_path(:name => repo.name, :full_name => repo.full_name,
-                          :github_id => repo.id),
-                          :method => :post, :class => "btn btn-success btn-block"%></td>
+                      <td>
+                        <% unless @current_repositories.any? { |r| r.github_id == repo.id } %>
+                          <%= link_to 'Add',
+                          repositories_path(:name => repo.name, :full_name => repo.full_name,
+                            :github_id => repo.id),
+                            :method => :post, :class => "btn btn-success btn-block" %>
+                        <% end %>
+                      </td>
                   </tr>
                   <% end %>
                 </tbody>
