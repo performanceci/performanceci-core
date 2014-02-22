@@ -25,6 +25,16 @@ class Build < ActiveRecord::Base
     endpoint
   end
 
+  def configure_build(yaml_hash)
+    (yaml_hash['endpoints'] || []).each do |e|
+      add_endpoint(
+        e['url'],
+        (e['headers'] || {}).to_hash,
+        max_response_time: e['max_response_time'],
+        name: e['name'])
+    end
+  end
+
   def endpoint_benchmark(endpoint, average_response, score, data)
     build_endpoints.create!(
       response_time: average_response,

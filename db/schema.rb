@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140222224517) do
+ActiveRecord::Schema.define(version: 20140222232930) do
 
   create_table "build_endpoints", force: true do |t|
     t.integer  "endpoint_id"
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 20140222224517) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "order"
+    t.integer  "max_response_time"
   end
 
   create_table "repositories", force: true do |t|

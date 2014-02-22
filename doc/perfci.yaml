@@ -1,0 +1,17 @@
+expose_ports: [3000, 8000, 8080]
+endpoints:
+  -
+    name: locations page
+    url: "http://localhost:3000/locations"
+    max_response_time: 100
+  -
+    name: users page
+    url: "http://localhost:3000/users"
+    max_response_time: 200
+
+  -
+    name: friends page
+    url: "http://localhost:3000/friends"
+    max_response_time: 300
+    headers:
+      auth_token: 12345
