@@ -10,5 +10,5 @@ test:
   port: 6379
 
 production:
-  host: localhost
+  host: 23.253.97.212
   port: 6379
