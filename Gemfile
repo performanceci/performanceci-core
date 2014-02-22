@@ -51,7 +51,7 @@ gem 'bcrypt-ruby', '3.1.2', :require => "bcrypt"
 gem 'resque'
 gem 'resque-status'
 
-
+gem 'seed_dump'
 
 
 group :doc do

@@ -10,6 +10,12 @@ class RepositoriesController < ApplicationController
   # GET /repositories/1
   # GET /repositories/1.json
   def show
+
+  end
+
+  def summary
+    @repository = current_user.repositories.find(params[:id])
+    render json: @repository.build_summary
   end
 
   # GET /repositories/new
