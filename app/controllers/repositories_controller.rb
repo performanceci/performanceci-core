@@ -24,7 +24,8 @@ class RepositoriesController < ApplicationController
   # POST /repositories
   # POST /repositories.json
   def create
-    @repository = Repository.new(name: params[:name], user: current_user)
+    @repository = Repository.new(name: params[:name], full_name: params[:full_name],
+      :github_id => params[:github_id], user: current_user)
 
     respond_to do |format|
       if @repository.save

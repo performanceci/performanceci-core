@@ -1,4 +1,6 @@
 Performanceci::Application.routes.draw do
+  resources :builds
+
   resources :repositories
 
   devise_for :users, controllers: { omniauth_callbacks: "omniauth_callbacks" }
@@ -10,7 +12,7 @@ Performanceci::Application.routes.draw do
 
   # Example of regular route:
 
-  post '/webhooks' => 'webhooks#hook'
+  post '/webhooks/:user_id' => 'webhooks#hook'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase

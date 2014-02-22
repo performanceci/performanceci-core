@@ -1,0 +1,44 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Ref:</strong>
+  <%= @build.ref %>
+</p>
+
+<p>
+  <strong>Before:</strong>
+  <%= @build.before %>
+</p>
+
+<p>
+  <strong>After:</strong>
+  <%= @build.after %>
+</p>
+
+<p>
+  <strong>Repository:</strong>
+  <%= @build.repository_id %>
+</p>
+
+<p>
+  <strong>Message:</strong>
+  <%= @build.message %>
+</p>
+
+<p>
+  <strong>Url:</strong>
+  <%= @build.url %>
+</p>
+
+<p>
+  <strong>Author:</strong>
+  <%= @build.author %>
+</p>
+
+<p>
+  <strong>Payload:</strong>
+  <%= @build.payload %>
+</p>
+
+<%= link_to 'Edit', edit_build_path(@build) %> |
+<%= link_to 'Back', builds_path %>

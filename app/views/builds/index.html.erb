@@ -1,0 +1,41 @@
+<h1>Listing builds</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Ref</th>
+      <th>Before</th>
+      <th>After</th>
+      <th>Repository</th>
+      <th>Message</th>
+      <th>Url</th>
+      <th>Author</th>
+      <th>Payload</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @builds.each do |build| %>
+      <tr>
+        <td><%= build.ref %></td>
+        <td><%= build.before %></td>
+        <td><%= build.after %></td>
+        <td><%= build.repository_id %></td>
+        <td><%= build.message %></td>
+        <td><%= build.url %></td>
+        <td><%= build.author %></td>
+        <td><%= build.payload %></td>
+        <td><%= link_to 'Show', build %></td>
+        <td><%= link_to 'Edit', edit_build_path(build) %></td>
+        <td><%= link_to 'Destroy', build, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Build', new_build_path %>

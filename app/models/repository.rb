@@ -5,9 +5,9 @@ class Repository < ActiveRecord::Base
   def add_hook
     #repo = user.github_client.repos.find { |r| r.name == name}
     hook = user.github_client.create_hook(
-      name,
+      full_name,
       'web',
-      hook_url_config,
+      hook_url_config(user),
       hook_options
     )
     self.hook_id = hook.id
@@ -16,10 +16,11 @@ class Repository < ActiveRecord::Base
 
   private
 
-  def hook_url_config
+  def hook_url_config(user)
     {
       #TODO: Config
-      url: 'http://52141385.ngrok.com/webhooks',
+      #TODO: Generate random id instead of user id
+      url: "http://ee75d51.ngrok.com/webhooks/#{user.id}",
       content_type: 'json'
     }
   end

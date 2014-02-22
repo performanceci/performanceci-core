@@ -1,4 +1,3 @@
-
 require 'bcrypt'
 
 class User < ActiveRecord::Base
@@ -7,6 +6,8 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable
+
+  has_many :repositories
 
   def self.from_omniauth(payload, current_user)
     puts payload

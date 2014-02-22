@@ -11,10 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140222052348) do
+ActiveRecord::Schema.define(version: 20140222082019) do
+
+  create_table "builds", force: true do |t|
+    t.string   "ref"
+    t.string   "before"
+    t.string   "after"
+    t.integer  "repository_id"
+    t.text     "message"
+    t.text     "payload"
+    t.text     "url"
+    t.string   "author"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "repositories", force: true do |t|
     t.string   "name"
+    t.string   "full_name"
     t.text     "url"
     t.integer  "github_id"
     t.integer  "user_id"
