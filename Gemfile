@@ -37,10 +37,12 @@ gem 'oauth2'
 gem 'omniauth'
 gem 'omniauth-oauth2'
 gem 'omniauth-github'
+gem "octokit", "~> 2.7.1"
+
 #gem 'bcrypt', :require => "bcrypt"
 
 # Use ActiveModel has_secure_password
-gem 'bcrypt-ruby', '~> 3.1.2'
+gem 'bcrypt-ruby', '3.1.2', :require => "bcrypt"
 
 
 

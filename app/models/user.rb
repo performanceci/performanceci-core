@@ -1,3 +1,6 @@
+
+require 'bcrypt'
+
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and
@@ -5,23 +8,19 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable
 
-  def self.from_omniauth(auth, current_user)
-    puts auth
-    if find_or_create_by.user.blank?
-      user = current_user.nil? ? User.where('email = ?', auth["info"]["email"]).first : current_user
-      if user.blank?
-       user = User.new
-       user.password = Devise.friendly_token[0,10]
-       user.name = auth.info.name
-       user.email = auth.info.email
-     end
-   end
-  end
-
-  def find_or_create_by(payload)
-    attrs = attributes_from(payload)
-    user = User.find_by_github_id(attrs['github_id'])
-    user ? user.update_attributes(attrs) : user = User.create!(attrs)
+  def self.from_omniauth(payload, current_user)
+    puts payload
+    user = User.find_by_email(payload['info']['email'])
+    if User.find_by_email(payload['info']['email']).blank?
+      user = User.new
+      user.password = Devise.friendly_token[0,10]
+      user.name = payload['info']['name']
+      user.email = payload['info']['email']
+      user.github_id = payload['uid'].to_i
+      user.github_oauth_token = payload['credentials']['token']
+      user.gravatar_id = payload['extra']['raw_info']['gravatar_id']
+      user.save
+    end
     user
   end
 
