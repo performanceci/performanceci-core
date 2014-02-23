@@ -35,6 +35,7 @@ class DockerWorker < Worker
       at(5, 7, "Killing container")
       container = Docker::Container.get(container_id)
       container.kill
+      image.remove
 
       at(6, 7, "Cleaning workspace")
       Worker.system_quietly("rm -rf #{path}")
