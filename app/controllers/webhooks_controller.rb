@@ -10,7 +10,8 @@ class WebhooksController < ApplicationController
     end
     DockerWorker.create(
       :url => build.url,
-      :repo => build.repository.name
+      :repo => build.repository.name,
+      :build_id => build.id
     )
     render :text => 'OK', :status => 200
   end
