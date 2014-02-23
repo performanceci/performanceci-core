@@ -12,6 +12,13 @@ class DockerWorker < Worker
       url = options['url']
       repo = options['repo']
       path = "/tmp/#{repo}"
+      host = 'http://23.253.97.212'
+      port = '4567'
+      endpoints = ["#{host}:#{port}/", "#{host}:#{port}/test"]
+      # endpoints.each do |foo|
+      #   opt.add
+      # end
+
       Worker.system_quietly("rm -rf #{path}")
 
       at(1, 7, "Cloning Repo")
@@ -26,7 +33,7 @@ class DockerWorker < Worker
 
 
       at(4, 7, "Attacking container")
-      job_id = KillaBeez.create(:url => 'http://23.253.97.212:4567/test')
+      job_id = KillaBeez.create(:endpoints => endpoints)
       while status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
         sleep 1
         puts status.inspect
@@ -35,6 +42,7 @@ class DockerWorker < Worker
       at(5, 7, "Killing container")
       container = Docker::Container.get(container_id)
       container.kill
+      image.remove
 
       at(6, 7, "Cleaning workspace")
       Worker.system_quietly("rm -rf #{path}")
