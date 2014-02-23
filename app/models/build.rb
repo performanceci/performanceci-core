@@ -13,7 +13,7 @@ class Build < ActiveRecord::Base
       after: payload['after'],
       message: payload['message'],
       compare: payload['compare'],
-      url: "git@github.com:#{repository.full_name}.git",
+      url: "https://github.com/#{repository.full_name}.git",
       repository: repository)
   end
 
