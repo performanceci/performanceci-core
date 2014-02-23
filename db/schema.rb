@@ -50,8 +50,8 @@ ActiveRecord::Schema.define(version: 20140222232930) do
     t.integer  "concurrency"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "max_response_time"
     t.integer  "order"
+    t.integer  "max_response_time"
   end
 
   create_table "repositories", force: true do |t|
