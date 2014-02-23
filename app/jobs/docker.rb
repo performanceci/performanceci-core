@@ -44,7 +44,7 @@ class DockerWorker < Worker
         sleep 1
       end
 
-      latency = status.latency
+      latency = status['latency']
       count = 0
       build_endpoints.each do |endpoint|
         build.endpoint_benchmark(endpoint, latency[count], 0, [])
