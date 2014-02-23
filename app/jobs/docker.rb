@@ -8,9 +8,10 @@ class DockerWorker < Worker
     @queue = "docker"
     def perform
       at(0, 3, "Cloning Repo")
-      url = options[:url]
-      repo = options[:repo]
-      path = "/tmp#{repo}"
+      url = options['url']
+      repo = options['repo']
+      path = "/tmp/#{repo}"
+      Worker.system_quietly("rm -rf #{path}")
       Git.clone(url, path)
       at(1, 3, "Building container")
       Docker::Image.build_from_dir('.')
