@@ -18,7 +18,7 @@ class DockerWorker < Worker
       image = Docker::Image.build_from_dir(path)
       sleep(5)
       #container = image.run()
-      Worker.system_quietly("docker -d -p 0.0.0.0:4567:4567 #{image.id}")
+      Worker.system_quietly("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
       puts ("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
       job_id = KillaBeez.create(:url => 'http://23.253.97.212:4567/test')
       while status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
