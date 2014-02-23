@@ -8,7 +8,8 @@
             </div>
             <!-- /.row -->
             <div class="row">
-                <div class="col-lg-8" ng-controller="TestResultCtrl" ng-init="repoUrl='/repositories/<%= @repository.id%>/summary.json'">
+                <div class="col-lg-8" ng-controller="TestResultCtrl">
+                	<div ng-init="init('/repositories/<%= @repository.id%>/summary.json')"></div>
                     <div class="panel panel-default" ng-repeat="endpointdata in repodata" >
                         <div class="panel-heading" >
                             <i class="fa fa-bar-chart-o fa-fw"></i> Endpoint:{{endpointdata.endpoint.url}} response

@@ -4,7 +4,7 @@ angular.module('results-overview', ['ngResource'])
       //  apiKey:'4fb51e55e4b02e56a67b0b66',
       //  id:'@_id.$oid'
       //});
-    	var Repo = $resource('http://127.0.0.1:3000/repositories/1/summary.json');
+    	var Repo = $resource('http://127.0.0.1:3000/repositories/5/summary.json');
       	
       	//Repo.prototype.endpointCount = function() {
         //	return 3;
@@ -17,9 +17,8 @@ angular.module('results-overview', ['ngResource'])
 		//This is async and will return a promise which will eventually be populated.
 		//This needs to be able to select the correct repository
 		//var repdata = $resource('http://127.0.0.1:3000/repositories/1/summary.json');
-		var repdata = $resource($scope.repoUrl);
-		alert($scope.repoUrl);
-		$scope.repodata = repdata.query();
+		
+		$scope.repodata = null;
 
 		//$scope.repodata = Repo.query();
 
@@ -31,6 +30,10 @@ angular.module('results-overview', ['ngResource'])
 
     	//Better to use promise and the data binding to let ui update automatically
     	//$scope.urlcount = Repo.query();
+    	$scope.init = function(value) {
+    		$scope.repoUrl = value;
+    		$scope.repodata = $resource($scope.repoUrl).query();
+  		}
 
 		$scope.getPercentComplete = function(doneCount){
 			return (doneCount/$scope.urlcount) * 100;
