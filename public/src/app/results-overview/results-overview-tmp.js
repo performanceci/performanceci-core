@@ -51,3 +51,6 @@ angular.module('results-overview', ['ngResource'])
 
       return Tests;
     })
+
+
+  <div id="morris-area-chart-{{endpointdata.endpoint.id}}"></div>
