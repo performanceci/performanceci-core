@@ -15,9 +15,10 @@ class DockerWorker < Worker
       host = 'http://23.253.97.212'
       port = '4567'
       endpoints = ["#{host}:#{port}/", "#{host}:#{port}/test"]
-      # endpoints.each do |foo|
-      #   opt.add
-      # end
+      build = Build.find(options['build_id'])
+      build_endpoints = endpoints.map do |url|
+        build.add_endpoint(url, {})
+      end
 
       Worker.system_quietly("rm -rf #{path}")
 
@@ -41,7 +42,13 @@ class DockerWorker < Worker
       job_id = KillaBeez.create(:endpoints => endpoints)
       while status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
         sleep 1
-        puts status.inspect
+      end
+
+      latency = status['latency']
+      count = 0
+      build_endpoints.each do |endpoint|
+        build.endpoint_benchmark(endpoint, latency[count], 0, [])
+        count += 1
       end
 
       at(5, 7, "Killing container")
