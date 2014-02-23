@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -o
+set -e
 
 apt-get update
 apt-get upgrade -y

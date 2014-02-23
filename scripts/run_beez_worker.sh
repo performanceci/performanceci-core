@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -o
+set -e
 
 export RAILS_ENV=production
 export QUEUE=beezAttackQueue
