@@ -16,21 +16,9 @@ class KillaBeez < Worker
 
       start = Time.now
       10.times.each do |time|
-        response = Net::HTTP.get_response(URI(url))
+        Net::HTTP.get_response(URI(url))
       end
       finish = Time.now
-
-
-      case response
-      when Net::HTTPSuccess then
-        response
-      when Net::HTTPRedirection then
-        location = response['location']
-        warn "redirected to #{location}"
-        fetch(location, limit - 1)
-      else
-        response.value
-      end
       diff = (finish - start) / 10
     end
 end
