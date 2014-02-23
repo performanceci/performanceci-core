@@ -243,7 +243,9 @@
                         <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                         </li>
                         <li class="divider"></li>
-                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+
+                        <li><%= link_to(destroy_user_session_path, :method => :delete) do %><i class="fa fa-sign-out fa-fw"></i> Logout
+                            <% end %>
                         </li>
                     </ul>
                     <!-- /.dropdown-user -->
@@ -270,7 +272,7 @@
                         <!-- /input-group -->
                     </li>
                     <li>
-                        <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        <a href="<%= results_overview_index_path%>"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                     </li>
                     <% if current_user %>
                         <li class="active">

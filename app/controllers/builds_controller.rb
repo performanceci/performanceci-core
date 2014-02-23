@@ -1,4 +1,6 @@
 class BuildsController < ApplicationController
+  before_filter :authenticate_user!
+
   before_action :set_build, only: [:show, :edit, :update, :destroy]
 
   # GET /builds

@@ -1,4 +1,6 @@
 class ResultsOverviewController < ApplicationController
+  before_filter :authenticate_user!
+
   before_action :set_repository, only: [:show, :edit, :update, :destroy]
 
   # GET /results_overview
