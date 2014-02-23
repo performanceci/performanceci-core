@@ -14,7 +14,7 @@ class DockerWorker < Worker
       Worker.system_quietly("rm -rf #{path}")
       Git.clone(url, path)
       at(1, 3, "Building container")
-      Docker::Image.build_from_dir('.')
+      Docker::Image.build_from_dir(path)
       at(2, 3, "Cleaning repo")
       Worker.system_quietly("rm -rf #{path}")
       puts "Container built"
