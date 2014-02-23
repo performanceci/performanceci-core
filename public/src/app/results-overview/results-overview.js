@@ -51,7 +51,7 @@ angular.module('results-overview', ['ngResource'])
 				var data = $scope[attrs.data].builds,
 	                xkey = 'commit',
 	                ykeys= ['response_time', 'created_at'],
-	                labels= ['Response Time', 'Timestamp'];
+	                labels= attrs.labels;
 	            
 	            var setData = function(){
 	                Morris.Bar({
