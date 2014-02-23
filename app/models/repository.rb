@@ -24,7 +24,7 @@ class Repository < ActiveRecord::Base
     grouped_endpoints = grouped_endpoints.map do |e,builds|
       builds = builds.map do |b|
         { response_time: b.response_time, created_at: b.created_at,
-          commit: b.build.after, compre:b.build.compare }
+          commit: b.build.after, compare:b.build.compare }
       end
       {endpoint: e, builds: builds }
     end
