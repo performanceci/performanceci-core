@@ -33,6 +33,9 @@ gem 'devise', '3.1.0'
 gem 'execjs'
 gem 'therubyracer', :platforms => :ruby
 
+# Docker
+gem 'docker-api', :require => 'docker'
+
 # upgrading to newer versions of these gems caused new github accounts to not be able to
 # sign in / create an account on our side
 gem 'oauth2'
