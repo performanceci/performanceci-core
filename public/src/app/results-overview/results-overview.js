@@ -12,11 +12,16 @@ angular.module('results-overview', ['ngResource'])
 
       	return Repo;
     }])
-    .controller('TestResultCtrl', ['$scope', 'Repo', function ($scope, Repo) {
+    .controller('TestResultCtrl', ['$scope', 'Repo', '$resource', function ($scope, Repo, $resource) {
 		
 		//This is async and will return a promise which will eventually be populated.
 		//This needs to be able to select the correct repository
-		$scope.repodata = Repo.query();
+		//var repdata = $resource('http://127.0.0.1:3000/repositories/1/summary.json');
+		var repdata = $resource($scope.repoUrl);
+		alert($scope.repoUrl);
+		$scope.repodata = repdata.query();
+
+		//$scope.repodata = Repo.query();
 
 		//$scope.urlcount = 2;
 		//Repo.query({}, function(tests){
@@ -49,7 +54,7 @@ angular.module('results-overview', ['ngResource'])
 	            //    labels= $scope[attrs.labels];
 
 				var data = $scope[attrs.data].builds,
-	                xkey = 'commit',
+	                xkey = 'index',
 	                ykeys= ['response_time'],
 	                labels= ['Response Time'];
 	            
@@ -59,7 +64,18 @@ angular.module('results-overview', ['ngResource'])
 	                    data: data,
 	                    xkey: xkey,
 	                    ykeys: ykeys,
-	                    labels: labels
+	                    labels: labels,
+	                    parseTime: false,
+				        hoverCallback: function (index, options, content) {
+  							var row = options.data[index];
+  							
+  							var newcon = "<div class='morris-hover-row-label'>Commit:"+ row.commit + " </div><div class='morris-hover-point' style='color: #0b62a4'>Response Time:" +
+  							row.response_time +"</div>";
+							
+							return newcon;
+							//return content;//"sin(" + row.commit + ") = " + row.compare;
+  							
+						}
 	                })
 	                .on('click', function(i, row){
 						//window.open();
@@ -83,7 +99,7 @@ angular.module('results-overview', ['ngResource'])
 	        link: function($scope, element, attrs) {
 
 				var data = $scope[attrs.data].builds,
-	                xkey = 'commit',
+	                xkey = 'index',
 	                ykeys= ['response_time'],
 	                hideHover= 'auto',
 	                resize= true,
@@ -98,7 +114,17 @@ angular.module('results-overview', ['ngResource'])
 				        labels: labels,
 				        hideHover: hideHover,
 				        resize: resize,
-				        parseTime: false
+				        parseTime: false,
+				        hoverCallback: function (index, options, content) {
+  							var row = options.data[index];
+  							
+  							var newcon = "<div class='morris-hover-row-label'>Commit:"+ row.commit + " </div><div class='morris-hover-point' style='color: #0b62a4'>Response Time:" +
+  							row.response_time +"</div>";
+							
+							return newcon;
+							//return content;//"sin(" + row.commit + ") = " + row.compare;
+  							
+						}
 				    })
 	                .on('click', function(i, row){
 						//window.open();
