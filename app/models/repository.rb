@@ -23,7 +23,7 @@ class Repository < ActiveRecord::Base
 
     grouped_endpoints = grouped_endpoints.map do |e,builds|
       result = []
-      builds.each_with_index do |b, i|
+      builds.sort_by { |b| b.created_at}.each_with_index do |b, i|
         result << { response_time: b.response_time, created_at: b.created_at, index: i,
           commit: b.build.after, compare:b.build.compare }
       end
