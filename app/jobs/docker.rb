@@ -8,7 +8,7 @@ class DockerWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
     def perform
-      at(0, 7, "Cleaning up workspace")
+      at(0, 9, "Cleaning up workspace")
       url = options['url']
       repo = options['repo']
       path = "/tmp/#{repo}"
@@ -22,10 +22,10 @@ class DockerWorker < Worker
 
       Worker.system_quietly("rm -rf #{path}")
 
-      at(1, 7, "Cloning Repo")
+      at(1, 9, "Cloning Repo")
       Git.clone(url, path)
 
-      at(2, 7, "Building container")
+      at(2, 9, "Building container")
       image = Docker::Image.build_from_dir(path)
       begin
         image.tag(:tag => 'latest')
@@ -33,15 +33,16 @@ class DockerWorker < Worker
         puts "Error #{e}"
       end
 
-      at(3, 7, "Running container")
+      at(3, 9, "Running container")
       container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
       puts container_id
 
 
-      at(4, 7, "Attacking container")
+      at(4, 9, "Creating Beez")
       job_ids = 6.times.collect do
           KillaBeez.create(:endpoints => endpoints)
       end
+      at(5, 9, "Attacking container")
       statuses = job_ids.map do |job_id|
         status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
         sleep 1
@@ -50,6 +51,7 @@ class DockerWorker < Worker
 
       latency = []
       count = 0
+      at(6, 9, "Storing stats")
       build_endpoints.each do |endpoint|
         latency[count] = statuses.inject { |sum, status| sum + status['latency'][count] }
         latency[count] = latency[count].reduce(:+) / 6
@@ -57,7 +59,7 @@ class DockerWorker < Worker
         count += 1
       end
 
-      at(5, 7, "Killing container")
+      at(7, 9, "Killing container")
       container = Docker::Container.get(container_id)
         container.kill
       begin
@@ -66,7 +68,7 @@ class DockerWorker < Worker
         puts "Error #{e}"
       end
 
-      at(6, 7, "Cleaning workspace")
+      at(8, 9, "Cleaning workspace")
       Worker.system_quietly("rm -rf #{path}")
       puts "Container built"
     end
