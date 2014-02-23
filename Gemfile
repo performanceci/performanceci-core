@@ -35,6 +35,7 @@ gem 'therubyracer', :platforms => :ruby
 
 # Docker
 gem 'docker-api', :require => 'docker'
+gem 'git'
 
 # upgrading to newer versions of these gems caused new github accounts to not be able to
 # sign in / create an account on our side
