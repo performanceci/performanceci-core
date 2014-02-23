@@ -26,6 +26,11 @@ class DockerWorker < Worker
 
       at(2, 7, "Building container")
       image = Docker::Image.build_from_dir(path)
+      begin
+        image.tag(:tag => 'latest')
+      rescue Exception => e
+        puts "Error #{e}"
+      end
 
       at(3, 7, "Running container")
       container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
@@ -41,8 +46,12 @@ class DockerWorker < Worker
 
       at(5, 7, "Killing container")
       container = Docker::Container.get(container_id)
-      container.kill
-      image.remove
+        container.kill
+      begin
+        image.remove
+      rescue Exception => e
+        puts "Error #{e}"
+      end
 
       at(6, 7, "Cleaning workspace")
       Worker.system_quietly("rm -rf #{path}")
