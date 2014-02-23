@@ -7,6 +7,11 @@ class ResultsOverviewController < ApplicationController
   # GET /results_overview.json
   def index
     @repositories = Repository.all
+    if params[:repository_id]
+      @repository = Repository.find(params[:repository_id])
+    else
+      @repository = Repository.first
+    end
   end
 
   # GET /results_overview/1
