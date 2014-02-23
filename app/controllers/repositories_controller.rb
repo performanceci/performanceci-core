@@ -36,6 +36,7 @@ class RepositoriesController < ApplicationController
 
     respond_to do |format|
       if @repository.save
+        @repository.add_hook
         format.html { redirect_to @repository, notice: 'Repository was successfully created.' }
         format.json { render action: 'show', status: :created, location: @repository }
       else

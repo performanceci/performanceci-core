@@ -1,6 +1,5 @@
 class Repository < ActiveRecord::Base
   belongs_to :user
-  before_create :add_hook
 
   has_many :endpoints
   has_many :builds
@@ -14,7 +13,7 @@ class Repository < ActiveRecord::Base
       hook_options
     )
     self.hook_id = hook.id
-    hook.id.present?
+    save
   end
 
   def build_summary
