@@ -9,9 +9,9 @@
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-8" ng-controller="TestResultCtrl">
-                    <div class="panel panel-default">
+                    <div class="panel panel-default" ng-repeat="endpointdata in repodata" >
                         <div class="panel-heading" >
-                            <i class="fa fa-bar-chart-o fa-fw"></i> {{urlcount}} Response Times
+                            <i class="fa fa-bar-chart-o fa-fw"></i> {{endpointdata}} Response Times
                             <div class="pull-right">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
