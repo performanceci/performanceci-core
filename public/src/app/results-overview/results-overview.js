@@ -4,7 +4,8 @@ angular.module('results-overview', ['ngResource'])
       //  apiKey:'4fb51e55e4b02e56a67b0b66',
       //  id:'@_id.$oid'
       //});
-    	var Repo = $resource('http://localhost:3000/results_overview.json');
+    	var Repo = $resource('http://127.0.0.1:3000/repositories/1/summary.json');
+      	
       	//Repo.prototype.endpointCount = function() {
         //	return 3;
       	//};
@@ -12,21 +13,20 @@ angular.module('results-overview', ['ngResource'])
       	return Repo;
     }])
     .controller('TestResultCtrl', ['$scope', 'Repo', function ($scope, Repo) {
-		//$scope.rooturl = "www.perfy.com";
-		//$scope.urlcount = 999999;
+		
+		//This is async and will return a promise which will eventually be populated.
+		$scope.repodata = Repo.query();
+		
 		//$scope.urlcount = 2;
 		Repo.query({}, function(tests){
-			$scope.urlcount = tests.length();
-			alert('Hello');
+			$scope.urlcount = tests.length;
+			//alert('Hello');
     	});
-		//$scope.urlcount = 77777;
+    	//Better to use promise and the data binding to let ui update automatically
+    	//$scope.urlcount = Repo.query();
 
+		$scope.repodata = Repo.query();
 
-		$scope.testurls = [
-			{url: "www.perfy.com", parent: "/"},
-			{url: "www.perfy.com/test1", parent: "www.perfy.com"},
-			{url: "www.perfy.com/test2", parent: "www.perfy.com"},
-		];
 		$scope.getPercentComplete = function(doneCount){
 			return (doneCount/$scope.urlcount) * 100;
 		}
