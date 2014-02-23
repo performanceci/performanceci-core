@@ -11,6 +11,7 @@ class Build < ActiveRecord::Base
       before:  payload['before'],
       after: payload['after'],
       message: payload['message'],
+      compare: payload['compare'],
       url: payload['url'],
       repository: repository)
   end

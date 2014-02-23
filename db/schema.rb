@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140222232930) do
+ActiveRecord::Schema.define(version: 20140223030733) do
 
   create_table "build_endpoints", force: true do |t|
     t.integer  "endpoint_id"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20140222232930) do
     t.string   "build_status"
     t.string   "docker_image_id"
     t.string   "docker_container_id"
+    t.text     "compare"
   end
 
   create_table "endpoints", force: true do |t|
