@@ -39,14 +39,20 @@ class DockerWorker < Worker
 
 
       at(4, 7, "Attacking container")
-      job_id = KillaBeez.create(:endpoints => endpoints)
-      while status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
+      job_ids = 6.times.collect do
+          KillaBeez.create(:endpoints => endpoints)
+      end
+      statuses = job_ids.map do |job_id|
+        status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
         sleep 1
+        status
       end
 
-      latency = status['latency']
+      latency = []
       count = 0
       build_endpoints.each do |endpoint|
+        latency[count] = statuses.inject { |sum, status| sum + status['latency'][count] }
+        latency[count] = latency[count].reduce(:+) / 6
         build.endpoint_benchmark(endpoint, latency[count], 0, [])
         count += 1
       end
