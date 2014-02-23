@@ -118,6 +118,9 @@ angular.module('results-overview', ['ngResource'])
 				        hideHover: hideHover,
 				        resize: resize,
 				        parseTime: false,
+				        goals: [1000, 500],
+				        goalStrokeWidth: 3,
+				        goalLineColors: ["red", "yellow"],
 				        hoverCallback: function (index, options, content) {
   							var row = options.data[index];
   							
