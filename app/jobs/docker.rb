@@ -43,9 +43,12 @@ class DockerWorker < Worker
           KillaBeez.create(:endpoints => endpoints)
       end
       at(5, 9, "Attacking container")
-      sleep 60
       statuses = job_ids.map do |job_id|
         status = Resque::Plugins::Status::Hash.get(job_id)
+        while !status.completed? && !status.failed? do
+          sleep 1
+          status = Resque::Plugins::Status::Hash.get(job_id)
+        end
         status['latency']
       end
 
