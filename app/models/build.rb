@@ -6,6 +6,7 @@ class Build < ActiveRecord::Base
   def self.from_payload(payload)
     user = User.find(payload[:user_id])
     repository = user.repositories.find_by_github_id(payload['repository']['id'])
+    puts payload.inspect
     Build.new(
       payload: JSON.generate(payload.to_hash),
       before:  payload['before'],
