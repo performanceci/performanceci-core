@@ -19,7 +19,7 @@ class Repository < ActiveRecord::Base
   def build_summary
     builds = self.builds.order('created_at desc').limit(20).includes(:build_endpoints)
     build_endpoints = builds.flat_map { |b| b.build_endpoints }
-    grouped_endpoints = build_endpoints.group_by { |be| be.endpoint.to_json }
+    grouped_endpoints = build_endpoints.group_by { |be| be.endpoint }
 
     grouped_endpoints = grouped_endpoints.map do |e,builds|
       builds = builds.map do |b|
