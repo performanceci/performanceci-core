@@ -22,7 +22,7 @@ class KillaBeez < Worker
         end
         finish = Time.now
         diff = finish - start
-        completed(:time => diff)
+        completed(:latency => diff)
         #Worker.system_quietly("#{cmd}")
         puts "done"
     end
