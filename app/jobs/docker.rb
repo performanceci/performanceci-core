@@ -26,7 +26,11 @@ class DockerWorker < Worker
 
       at(2, 7, "Building container")
       image = Docker::Image.build_from_dir(path)
-      image.tag(:tag => 'latest')
+      begin
+        image.tag(:tag => 'latest')
+      rescue Exception => e
+        puts "Error #{e}"
+      end
 
       at(3, 7, "Running container")
       container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
