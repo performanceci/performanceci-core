@@ -8,24 +8,35 @@ class DockerWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
     def perform
-      at(0, 3, "Cloning Repo")
+      at(0, 7, "Cleaning up workspace")
       url = options['url']
       repo = options['repo']
       path = "/tmp/#{repo}"
       Worker.system_quietly("rm -rf #{path}")
+
+      at(1, 7, "Cloning Repo")
       Git.clone(url, path)
-      at(1, 3, "Building container")
+
+      at(2, 7, "Building container")
       image = Docker::Image.build_from_dir(path)
-      sleep(5)
-      #container = image.run()
-      Worker.system_quietly("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
-      puts ("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
+
+      at(3, 7, "Running container")
+      container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
+      puts container_id
+
+
+      at(4, 7, "Attacking container")
       job_id = KillaBeez.create(:url => 'http://23.253.97.212:4567/test')
       while status = Resque::Plugins::Status::Hash.get(job_id) and !status.completed? && !status.failed?
-        sleep 3
+        sleep 1
         puts status.inspect
       end
-      at(2, 3, "Cleaning repo")
+
+      at(5, 7, "Killing container")
+      container = Docker::Container.get(container_id)
+      container.kill
+
+      at(6, 7, "Cleaning workspace")
       Worker.system_quietly("rm -rf #{path}")
       puts "Container built"
     end
