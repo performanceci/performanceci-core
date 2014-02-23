@@ -1,4 +1,5 @@
 require_relative '../jobs/killabeez.rb'
+require_relative '../jobs/docker.rb'
 
 class JobTestController < ApplicationController
     def swarm
