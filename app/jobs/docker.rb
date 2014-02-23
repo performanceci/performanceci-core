@@ -16,6 +16,7 @@ class DockerWorker < Worker
       Git.clone(url, path)
       at(1, 3, "Building container")
       image = Docker::Image.build_from_dir(path)
+      sleep(5)
       #container = image.run()
       Worker.system_quietly("docker -d -p 0.0.0.0:4567:4567 #{image.id}")
       puts ("docker run -d -p 0.0.0.0:4567:4567 #{image.id}")
