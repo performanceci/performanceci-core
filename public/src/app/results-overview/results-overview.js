@@ -60,7 +60,50 @@ angular.module('results-overview', ['ngResource'])
 	                    xkey: xkey,
 	                    ykeys: ykeys,
 	                    labels: labels
-	                });
+	                })
+	                .on('click', function(i, row){
+						//window.open();
+						window.open(data[i].compare,"_blank","toolbar=yes, scrollbars=yes, resizable=yes, top=50, left=500, width=800, height=600");
+ 					});
+	            };
+
+	            attrs.$observe('data',setData); //lets just observe only the data because it is bad to use many observers, anyway this won't work without supplied data
+	        }
+	    };
+	})
+	.directive('linechart', function() {
+
+	    return {
+
+	        // required to make it work as an element
+	        restrict: 'E',
+	        template: '<div></div>',
+	        replace: true,
+	        // observe and manipulate the DOM
+	        link: function($scope, element, attrs) {
+
+				var data = $scope[attrs.data].builds,
+	                xkey = 'commit',
+	                ykeys= ['response_time'],
+	                hideHover= 'auto',
+	                resize= true,
+	                labels= ['Response Time'];
+	            
+	            var setData = function(){
+	                Morris.Line({
+				        element: element,
+				        data: data,
+				        xkey: xkey,
+				        ykeys: ykeys,
+				        labels: labels,
+				        hideHover: hideHover,
+				        resize: resize,
+				        parseTime: false
+				    })
+	                .on('click', function(i, row){
+						//window.open();
+						window.open(data[i].compare,"_blank","toolbar=yes, scrollbars=yes, resizable=yes, top=50, left=500, width=800, height=600");
+ 					});
 	            };
 
 	            attrs.$observe('data',setData); //lets just observe only the data because it is bad to use many observers, anyway this won't work without supplied data
