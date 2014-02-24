@@ -27,6 +27,13 @@ class DockerWorker < Worker
       at(1, 9, "Cloning Repo")
       Git.clone(url, workspace)
       # Check for Dockerfile and perfci.yaml
+      ['Dockerfile', '.perfci.yaml'].each do |file|
+        if !File.exists? "#{workspace}/#{file}"
+          completed(:status => 'failed')
+          build.mark_build_error
+        end
+      end
+
       # Read endpoints from perfci.yaml
 
       at(2, 9, "Building container")
@@ -72,6 +79,7 @@ class DockerWorker < Worker
         puts "Error: #{e}"
         puts "Type: #{e.inspect}"
         container.kill
+        build.mark_build_error
         raise e
       end
 
@@ -80,7 +88,7 @@ class DockerWorker < Worker
 
       at(8, 9, "Cleaning workspace")
       FileUtils.rm_r base
-      build.mark_finished
+      build.mark_build_finished
       puts "Performance Tested!"
     end
 end
