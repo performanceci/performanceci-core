@@ -38,10 +38,9 @@ class DockerWorker < Worker
       # Read endpoints from perfci.yaml
       conf = File.read("#{workspace}/.perfci.yaml")
       yaml_hash = YAML.load(conf)
-      build.configure_build(yaml_hash)
-      endpoints = (yaml_hash['endpoints'] || []).map do |endpoint|
-        endpoint['uri']
-      end
+      #build.configure_build(yaml_hash)
+      endpoints = (yaml_hash['endpoints'] || []).map { |endpoint| endpoint['uri'] }
+      build_endpoints = endpoints.map { |uri| build.add_endpoint(uri, {}) }
 
       at(2, 9, "Building container")
       build.update_status(:building_container, 20)

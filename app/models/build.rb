@@ -61,6 +61,10 @@ class Build < ActiveRecord::Base
     end
   end
 
+  def build_status_message
+    Build.message_for_status(build_status)
+  end
+
   def endpoint_benchmark(endpoint, average_response, score, data)
     #TODO: Move this to endpoint model with easier API
     build_endpoints.create!(
@@ -70,7 +74,6 @@ class Build < ActiveRecord::Base
       endpoint: endpoint,
       build: self)
   end
-
 
   def mark_endpoint_error(endpoint, error_message = "")
     build_endpoints.create!(
@@ -112,7 +115,7 @@ class Build < ActiveRecord::Base
     when :warn
       "Build Warning: Endpoint exceeded target response time"
     when :error
-      "Build Error: #{error_message}"
+      "Build Crapped Out"
     else
       "Unknown"
     end
