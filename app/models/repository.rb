@@ -33,6 +33,10 @@ class Repository < ActiveRecord::Base
     end
   end
 
+  def last_build
+    builds.order("created_at DESC").first
+  end
+
   private
 
   def hook_url_config(user)
