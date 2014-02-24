@@ -71,7 +71,7 @@ class DockerWorker < Worker
       begin
         latency = []
         count = 0
-        build_endpoints.each do |endpoint|
+        endpoints.each do |endpoint|
           latencies = statuses.map { |lat|  lat[count] }
           latency[count] = latencies.reduce(:+)
           latency[count] = latency[count] / 6
