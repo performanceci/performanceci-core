@@ -8,7 +8,7 @@ class KillaBeez < Worker
       host      = options['host']      || 'localhost'
       endpoints = options['endpoints'] || ['/', '/test']
       port      = options['port']      || '4567'
-      attacks   = options['attacks']   || 10
+      attacks   = options['attacks']   || 5
 
       at(0, 1, "Killa Beez on the swarm")
       respone_time = endpoints.map do |uri|
