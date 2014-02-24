@@ -29,8 +29,8 @@ class DockerWorker < Worker
       # Check for Dockerfile and perfci.yaml
       ['Dockerfile', '.perfci.yaml'].each do |file|
         if !File.exists? "#{workspace}/#{file}"
-          completed(:status => 'failed')
           build.mark_build_error
+          return
         end
       end
 
@@ -80,6 +80,7 @@ class DockerWorker < Worker
         puts "Type: #{e.inspect}"
         container.kill
         build.mark_build_error
+        return
         raise e
       end
 
