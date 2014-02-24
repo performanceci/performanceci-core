@@ -31,6 +31,18 @@ class Build < ActiveRecord::Base
     endpoint
   end
 
+  def update_status(status, pct_done)
+    update_attributes! build_status:status,percent_done:pct_done
+  end
+
+  def mark_finished
+    update_status('success', 100)
+  end
+
+  def mark_build_error
+    #
+  end
+
   def configure_build(yaml_hash)
     (yaml_hash['endpoints'] || []).each do |e|
       add_endpoint(
