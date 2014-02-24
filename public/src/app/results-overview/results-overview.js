@@ -83,20 +83,25 @@ angular.module('results-overview', ['ngResource'])
 												var filtereddata = $scope.builddata.filter(function(val) {
 																								return val.repository_id == $scope.repoId;
 																							});
-												var data = filtereddata[0];
+												//Get the last build status out
+												var data = filtereddata[filtereddata.length -1];
 												// each item is an instance of CreditCard
 												//expect(card instanceof CreditCard).toEqual(true);
 												//card.name = "J. Smith";);
 			            						if( data )
 			            						{	
-			            							if($scope.show_status == false)
+			            							if($scope.show_status == false){
 			            								$scope.show_status = true;
+			            							}
 			            							$scope.build_status = data.build_status;
 			            							$scope.build_percent = data.percent_done;
 			            						}
 			            						else
 			            						{	//Handle the error case
-			            							$scope.show_status = false;
+			            							if($scope.show_status == true){
+			            								$scope.show_status = false;
+			            								location.reload(true);
+			            							}
 			            							//$scope.build_status = "Complete"
 			            						}
 		            						})
