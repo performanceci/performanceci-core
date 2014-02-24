@@ -44,11 +44,14 @@ angular.module('results-overview', ['ngResource'])
 	}])
 	.controller('BuildStatusCtrl', ['$scope', '$resource', '$timeout', function ($scope, $resource, $timeout) {
 
-		//This is async and will return a promise which will eventually be populated.
-		//This needs to be able to select the correct repository
-		//var repdata = $resource('http://127.0.0.1:3000/repositories/1/summary.json');
+		$scope.ongoingUrl = null;
+		$scope.repoId = null;
+		$scope.builddataquery = null;
 
 		$scope.builddata = null;
+		$scope.build_percent = null;
+		$scope.build_status = null;
+		$scope.show_status = false;
 
 		//$scope.repodata = Repo.query();
 
@@ -60,9 +63,10 @@ angular.module('results-overview', ['ngResource'])
 
     	//Better to use promise and the data binding to let ui update automatically
     	//$scope.urlcount = Repo.query();
-    	$scope.init = function(value) {
-    		$scope.buildUrl = value;
-    		$scope.builddata = $resource($scope.buildUrl);
+    	$scope.init = function(endpoint, repoId) {
+    		$scope.ongoingUrl = endpoint;
+    		$scope.repoId = repoId;
+    		$scope.builddataquery = $resource($scope.ongoingUrl);
     		poll();
   		}
   		
@@ -70,10 +74,32 @@ angular.module('results-overview', ['ngResource'])
 			return (doneCount/$scope.urlcount) * 100;
 		};
 
-		$scope.value = 1;
     	var poll = function() {
         	$timeout(function() {
-		            	$scope.value++;
+        				//Ugly and has to be a better way to deal with async promise binding to other vars
+		            	$scope.builddata = $scope.builddataquery.query(function() {
+												// server returns: [ {id:456, number:'1234', name:'Smith'} ];
+												// NOTE: This needs to check the repository id and us that to filter
+												var filtereddata = $scope.builddata.filter(function(val) {
+																								return val.repository_id == $scope.repoId;
+																							});
+												var data = filtereddata[0];
+												// each item is an instance of CreditCard
+												//expect(card instanceof CreditCard).toEqual(true);
+												//card.name = "J. Smith";);
+			            						if( data )
+			            						{	
+			            							if($scope.show_status == false)
+			            								$scope.show_status = true;
+			            							$scope.build_status = data.build_status;
+			            							$scope.build_percent = data.percent_done;
+			            						}
+			            						else
+			            						{	//Handle the error case
+			            							$scope.show_status = false;
+			            							//$scope.build_status = "Complete"
+			            						}
+		            						})
 		            	poll();
 		        	 }, 1000);
     	};

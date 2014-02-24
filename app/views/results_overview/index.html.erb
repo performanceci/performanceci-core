@@ -1,25 +1,26 @@
 
 		<div id="page-wrapper" ng-app="results-overview">
             <div class="row">
-                <div class="col-lg-12">
-                    <h3 class="page-header">Repository: <%= @repository.full_name%></h3>
+                <div class="col-lg-10">
+                    <h2 class="page-header">Repository: <%= @repository.full_name%></h2>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
             <div class="row">
-                <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('rep')">
-                    <h3 class="page-header">Build Status: {{value}}</h3>
+                <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)">
+                    <h3 class="page-header" ng-hide="!show_status">
                     <div>
                         <p>
-                            <strong>Task 1</strong>
-                            <span class="pull-right text-muted">{{value}}% Complete</span>
+                            <strong>Build Status: {{build_status}}</strong>
+                            <span class="pull-right text-muted">{{build_percent}}% Complete</span>
                         </p>
                         <div class="progress progress-striped active">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-                                <span class="sr-only">{{value}}% Complete (success)</span>
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: {{build_percent}}%">
+                                <span class="sr-only">{{build_percent}}% Complete (success)</span>
                             </div>
                         </div>
                     </div>
+                    </h3>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>

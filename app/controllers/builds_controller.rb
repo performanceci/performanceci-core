@@ -14,7 +14,7 @@ class BuildsController < ApplicationController
   end
 
   def ongoing
-    @builds = Build.ongoing.select(:id, :build_status, :percent_done)
+    @builds = Build.ongoing.select(:id, :repository_id, :build_status, :percent_done)
     respond_to do |format|
       format.html { render action: 'index' }
       format.json { render json: @builds.to_json}
