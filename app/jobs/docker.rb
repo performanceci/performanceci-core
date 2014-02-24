@@ -38,8 +38,9 @@ class DockerWorker < Worker
       # Read endpoints from perfci.yaml
       conf = File.read("#{workspace}/.perfci.yaml")
       yaml_hash = YAML.load(conf)
+      build.configure_build(yaml_hash)
       endpoints = (yaml_hash['endpoints'] || []).map do |endpoint|
-        build.add_endpoint(endpoint['uri'], {})
+        endpoint['uri']
       end
 
       at(2, 9, "Building container")
@@ -50,7 +51,7 @@ class DockerWorker < Worker
       container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
       container = Docker::Container.get(container_id)
 
-      at(4, 9, "Singaling KillaBeez")
+      at(4, 9, "Signaling KillaBeez")
       build.update_status(:attacking_container, 40)
       job_ids = 6.times.collect do
           KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
