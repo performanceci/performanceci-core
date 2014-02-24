@@ -3,7 +3,11 @@ Performanceci::Application.routes.draw do
 
   resources :endpoints
 
-  resources :builds
+  resources :builds do
+    collection do
+      get 'ongoing'
+    end
+  end
 
   resources :repositories do
     member do

@@ -3,11 +3,16 @@ class Build < ActiveRecord::Base
 
   has_many :build_endpoints
 
+  scope :ongoing, -> { where("build_status NOT IN(?)", %w(success failed error))}
+
+  BUILD_STATUSES = %w(pending building_container attacking_container success failed error)
+
   def self.from_payload(payload)
     user = User.find(payload[:user_id])
     repository = user.repositories.find_by_github_id(payload['repository']['id'])
     Build.new(
       payload: JSON.generate(payload.to_hash),
+      build_status: 'pending',
       before:  payload['before'],
       after: payload['after'],
       message: payload['message'],
