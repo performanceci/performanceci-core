@@ -12,7 +12,7 @@ class BuildEndpoint < ActiveRecord::Base
       if response_time
         if endpoint.max_response_time && response_time > endpoint.max_response_time
           self.status = :failed
-        elsif endpoint.warn_response_time && response_time > endpoint.warn_response_time
+        elsif endpoint.target_response_time && response_time > endpoint.target_response_time
           self.status = :warn
         else
           self.status = :success
