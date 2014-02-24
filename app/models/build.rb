@@ -36,7 +36,7 @@ class Build < ActiveRecord::Base
   end
 
   def mark_finished
-    #
+    update_status('success', 100)
   end
 
   def mark_build_error
