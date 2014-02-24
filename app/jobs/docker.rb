@@ -4,6 +4,7 @@ ENV['DOCKER_URL'] = 'unix:///var/run/docker.sock'
 require 'fileutils'
 require 'docker'
 require 'git'
+require 'yaml'
 
 class DockerWorker < Worker
     include Resque::Plugins::Status
@@ -27,7 +28,20 @@ class DockerWorker < Worker
       at(1, 9, "Cloning Repo")
       Git.clone(url, workspace)
       # Check for Dockerfile and perfci.yaml
+      ['Dockerfile', '.perfci.yaml'].each do |file|
+        if !File.exists? "#{workspace}/#{file}"
+          build.mark_build_error
+          return
+        end
+      end
+
       # Read endpoints from perfci.yaml
+      conf = File.read("#{workspace}/.perfci.yaml")
+      yaml_hash = YAML.load(conf)
+      build.configure_build(yaml_hash)
+      endpoints = (yaml_hash['endpoints'] || []).map do |endpoint|
+        endpoint['uri']
+      end
 
       at(2, 9, "Building container")
       build.update_status(:building_container, 20)
@@ -37,12 +51,8 @@ class DockerWorker < Worker
       container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
       container = Docker::Container.get(container_id)
 
-      at(4, 9, "Singaling KillaBeez")
+      at(4, 9, "Signaling KillaBeez")
       build.update_status(:attacking_container, 40)
-      endpoints = ["/", "/test"]
-      build_endpoints = endpoints.map do |uri|
-        build.add_endpoint(uri, {})
-      end
       job_ids = 6.times.collect do
           KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
       end
@@ -61,7 +71,7 @@ class DockerWorker < Worker
       begin
         latency = []
         count = 0
-        build_endpoints.each do |endpoint|
+        endpoints.each do |endpoint|
           latencies = statuses.map { |lat|  lat[count] }
           latency[count] = latencies.reduce(:+)
           latency[count] = latency[count] / 6
@@ -72,6 +82,8 @@ class DockerWorker < Worker
         puts "Error: #{e}"
         puts "Type: #{e.inspect}"
         container.kill
+        build.mark_build_error
+        return
         raise e
       end
 
@@ -80,7 +92,7 @@ class DockerWorker < Worker
 
       at(8, 9, "Cleaning workspace")
       FileUtils.rm_r base
-      build.mark_finished
+      build.mark_build_finished
       puts "Performance Tested!"
     end
 end

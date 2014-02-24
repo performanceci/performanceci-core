@@ -2,8 +2,23 @@
 		<div id="page-wrapper" ng-app="results-overview">
             <div class="row">
                 <div class="col-lg-10">
-                    <h2 class="page-header">Repository: <%= @repository.full_name%></h2>
+                    <h2 class="page-header">Repository: <%= @repository.full_name%>
+                        <% if @build %>
+                            <p>Build Status: <%=@build.build_status %></p>
+                            <% if @build.build_status == 'error' %>
+                                <% if @build.error_message %>
+                                    <p>Build Error: <%=@build.error_message %></p>
+                                <% end %>
+                            <% else %>
+                                <p>Average Response: <%=@build.average_response %></p>
+                                <p>Percent Change: <%=@build.percent_change %></p>
+                                <p>Total Endpoints: <%=@build.build_endpoints.count %></p>
+                            <% end %>
+                        <% end %>
+                    </h2>
+
                 </div>
+
                 <!-- /.col-lg-12 -->
             </div>
             <div class="row">
