@@ -21,6 +21,7 @@ class DockerWorker < Worker
       workspace = "#{base}/#{repo}"
 
       at(0, 9, "Cleaning up workspace")
+      build.update_status(:pending, 0)
       FileUtils.rm_r base if Dir.exists? base
 
       at(1, 9, "Cloning Repo")
@@ -29,12 +30,15 @@ class DockerWorker < Worker
       # Read endpoints from perfci.yaml
 
       at(2, 9, "Building container")
+      build.update_status(:building_container, 20)
       image = Docker::Image.build_from_dir(workspace)
 
       at(3, 9, "Running container")
       container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
+      container = Docker::Container.get(container_id)
 
       at(4, 9, "Singaling KillaBeez")
+      build.update_status(:attacking_container, 40)
       endpoints = ["/", "/test"]
       build_endpoints = endpoints.map do |uri|
         build.add_endpoint(uri, {})
@@ -66,15 +70,17 @@ class DockerWorker < Worker
         end
       rescue Exception => e
         puts "Error: #{e}"
+        puts "Type: #{e.inspect}"
+        container.kill
         raise e
       end
 
       at(7, 9, "Killing container")
-      container = Docker::Container.get(container_id)
       container.kill
 
       at(8, 9, "Cleaning workspace")
       FileUtils.rm_r base
+      build.mark_finished
       puts "Performance Tested!"
     end
 end
