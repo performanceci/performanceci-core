@@ -18,8 +18,8 @@
                                         <p>Build Error: <%=@build.error_message %></p>
                                     <% end %>
                                 <% else %>
-                                    <p>Average Response: <%=@build.average_response %></p>
-                                    <p>Percent Change: <%=@build.percent_change %></p>
+                                    <p>Average Response: <%= format_float @build.average_response %></p>
+                                    <p>Percent Change: <%= format_percent @build.percent_change %> %</p>
                                     <p>Total Endpoints: <%=@build.build_endpoints.count %></p>
                                 <% end %>
                             </div>
