@@ -9,10 +9,10 @@ class BuildEndpoint < ActiveRecord::Base
 
   def set_status
     if status != :error
-      if average_response
-        if endpoint.max_response_time && average_response > endpoint.max_response_time
+      if response_time
+        if endpoint.max_response_time && response_time > endpoint.max_response_time
           self.status = :failed
-        elsif endpoint.warn_response_time && average_response > endpoint.warn_response_time
+        elsif endpoint.warn_response_time && response_time > endpoint.warn_response_time
           self.status = :warn
         else
           self.status = :success
