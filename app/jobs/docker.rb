@@ -4,6 +4,7 @@ ENV['DOCKER_URL'] = 'unix:///var/run/docker.sock'
 require 'fileutils'
 require 'docker'
 require 'git'
+require 'yaml'
 
 class DockerWorker < Worker
     include Resque::Plugins::Status
@@ -35,6 +36,11 @@ class DockerWorker < Worker
       end
 
       # Read endpoints from perfci.yaml
+      conf = File.read("#{workspace}/.perfci.yaml")
+      yaml_hash = YAML.load(conf)
+      endpoints = (yaml_hash['endpoints'] || []).map do |endpoint|
+        build.add_endpoint(endpoint['uri'], {})
+      end
 
       at(2, 9, "Building container")
       build.update_status(:building_container, 20)
@@ -46,10 +52,6 @@ class DockerWorker < Worker
 
       at(4, 9, "Singaling KillaBeez")
       build.update_status(:attacking_container, 40)
-      endpoints = ["/", "/test"]
-      build_endpoints = endpoints.map do |uri|
-        build.add_endpoint(uri, {})
-      end
       job_ids = 6.times.collect do
           KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
       end
