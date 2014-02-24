@@ -187,6 +187,8 @@ angular.module('results-overview', ['ngResource'])
 				        hideHover: hideHover,
 				        resize: resize,
 				        parseTime: false,
+				        xLabelFormat: function (x) { return x.toString(); },
+				        yLabelFormat: function (y) { return y.toString(); },
 				        goals: [1, 0.5],
 				        goalStrokeWidth: 3,
 				        goalLineColors: ["red", "yellow"],
@@ -205,6 +207,7 @@ angular.module('results-overview', ['ngResource'])
 						//window.open();
 						window.open(data[i].compare,"_blank","toolbar=yes, scrollbars=yes, resizable=yes, top=50, left=500, width=800, height=600");
  					});
+ 					//$('svg').height(500);
 	            };
 
 	            attrs.$observe('data',setData); //lets just observe only the data because it is bad to use many observers, anyway this won't work without supplied data

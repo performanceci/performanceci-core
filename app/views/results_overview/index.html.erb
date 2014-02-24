@@ -26,39 +26,94 @@
             </div>
             <% if @repository %>
             <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-10" ng-controller="TestResultCtrl">
-                	<div ng-init="init('/repositories/<%= @repository.id%>/summary.json')"></div>
-                    <div class="panel panel-default" ng-repeat="endpointdata in repodata" >
-                        <div class="panel-heading" >
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Endpoint:{{endpointdata.endpoint.url}} response
-                            <div class="pull-right">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                        Chart
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="#">Response time</a>
-                                        </li>
-                                        <li><a href="#">% Change</a>
-                                        </li>
-                                    </ul>
+            <div ng-controller="TestResultCtrl">
+                <div ng-init="init('/repositories/<%= @repository.id%>/summary.json')"></div>
+
+                <div class="row" ng-repeat="endpointdata in repodata">
+                    <div class="col-lg-10" >
+                        <div class="panel panel-default">
+                            <div class="panel-heading" >
+                                <i class="fa fa-bar-chart-o fa-fw"></i> Endpoint:{{endpointdata.endpoint.url}} response
+                                <div class="pull-right">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            Chart
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu pull-right" role="menu">
+                                            <li><a href="#">Response time</a>
+                                            </li>
+                                            <li><a href="#">% Change</a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                        	<linechart data="endpointdata"></barchart>
-                        </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel-body">
+                            	<linechart data="endpointdata"></linechart>
+                            </div>
+                            <!-- /.panel-body -->
 
-                        <!-- /.panel-body -->
+                        </div>
                     </div>
+                    <!-- /.col-lg-10 -->
+                    <div class="col-lg-2">
+                        <!-- Start here -->
+                        <div class="chat-panel panel panel-default">
+                            <div class="panel-heading">
+                                <i class="fa fa-comments fa-fw"></i>
+                                Last Status
+                            </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel-body">
+                                <ul class="chat">
+                                    <li class="left clearfix">
+                                        <span class="chat-img pull-left">
+                                            <i class="fa fa-thumbs-o-up fa-3x fa-fw" style="color:green"></i>
+                                        </span>
+                                        <div class="chat-body clearfix">
+                                            <div class="header">
+                                                <strong class="primary-font">Built</strong> 
+                                                <small class="pull-right text-muted">
+                                                    <i class="fa fa-clock-o fa-fw"></i> 12 mins ago
+                                                </small>
+                                            </div>
+                                            <p>
+                                                Some build text
+                                            </p>
+                                        </div>
+                                    </li>
+                                    <li class="right clearfix">
+                                        <span class="chat-img pull-right">
+                                            <i class="fa fa-thumbs-o-down fa-3x fa-fw" style="color:red"></i>
+                                        </span>
+                                        <div class="chat-body clearfix">
+                                            <div class="header">
+                                                <small class=" text-muted">
+                                                    <i class="fa fa-clock-o fa-fw"></i> 13 mins ago</small>
+                                                <strong class="pull-right primary-font">Built</strong>
+                                            </div>
+                                            <p>
+                                                More build text
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /.panel-body -->
+                            <div class="panel-footer">
+                            </div>
+                            <!-- /.panel-footer -->
+                        </div>
+                        <!-- Stop here -->    
+                    </div>
+                    <!-- /.col-lg-10 -->
                 </div>
-                <!-- /.col-lg-8 -->
+                <!-- Container div -->
             </div>
-            <% end %>
             <!-- /.row -->
+            <% end %>
         </div>
         <!-- /#page-wrapper -->
         <!-- Page-Level Demo Scripts - Blank - Use for reference -->
