@@ -5,7 +5,7 @@ class Build < ActiveRecord::Base
 
   scope :ongoing, -> { where("build_status NOT IN(?)", %w(success failed error))}
 
-  BUILD_STATUSES = %w(pending building_container attacking_container success failed error)
+  BUILD_STATUSES = %w(pending building_container attacking_container success failed warn error)
 
   def self.from_payload(payload)
     user = User.find(payload[:user_id])
@@ -72,12 +72,13 @@ class Build < ActiveRecord::Base
   end
 
 
-  def mark_endpoint_error(endpoint)
+  def mark_endpoint_error(endpoint, error_message = "")
     build_endpoints.create!(
       response_time: 0,
       score: 0,
       data: [].to_json,
       endpoint: endpoint,
+      error_message: error_message,
       status: :error,
       build: self)
   end
@@ -94,6 +95,27 @@ class Build < ActiveRecord::Base
   def fake_benchmarks(n)
     data = (1..n).map { rand(1000) }
     [data, rand(11), data.inject(:+) / n.to_f]
+  end
+
+  def self.message_for_status(status)
+    case (status || '').to_sym
+    when :pending
+      "Waiting to Build"
+    when :building_container
+      "Building Docker Container"
+    when :attacking_container
+      "Benchmarking Container"
+    when :success
+      "Success"
+    when :failed
+      "Build Failed: Endpoint exceeded maximum response time"
+    when :warn
+      "Build Warning: Endpoint exceeded target response time"
+    when :error
+      "Build Error: #{error_message}"
+    else
+      "Unknown"
+    end
   end
 
   private

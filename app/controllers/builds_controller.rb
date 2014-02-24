@@ -15,6 +15,12 @@ class BuildsController < ApplicationController
 
   def ongoing
     @builds = Build.ongoing.select(:id, :repository_id, :build_status, :percent_done)
+    #TODO - move this to JSON serializer
+    @builds = @builds.map do |build|
+      attribs = build.attributes
+      attribs[:status_message] = Build.message_for_status(attribs['build_status'])
+      attribs
+    end
     respond_to do |format|
       format.html { render action: 'index' }
       format.json { render json: @builds.to_json}

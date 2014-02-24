@@ -27,7 +27,7 @@ class Repository < ActiveRecord::Base
       result = []
       builds.sort_by { |b| b.created_at}.each_with_index do |b, i|
         result << { response_time: b.response_time, created_at: b.created_at, index: i,
-          commit: b.build.after, compare:b.build.compare }
+          status: b.status || 'success', commit: b.build.after, compare:b.build.compare }
       end
       {endpoint: e, builds: result }
     end

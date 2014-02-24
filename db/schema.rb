@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140224061444) do
+ActiveRecord::Schema.define(version: 20140224230212) do
 
   create_table "build_endpoints", force: true do |t|
     t.integer  "endpoint_id"
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 20140224061444) do
     t.string   "status"
     t.float    "average_response"
     t.float    "percent_change",      default: 0.0
+    t.text     "error_message"
   end
 
   create_table "endpoints", force: true do |t|
@@ -57,8 +58,8 @@ ActiveRecord::Schema.define(version: 20140224061444) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "order"
-    t.integer  "max_response_time"
-    t.float    "warn_response_time"
+    t.float    "max_response_time"
+    t.float    "target_response_time"
   end
 
   create_table "repositories", force: true do |t|
