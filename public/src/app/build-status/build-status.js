@@ -1,48 +1,18 @@
-'use strict';
-
-angular.module('results-overview', ['ngResource'])
-	.factory('Repo', ['$resource', function ($resource) {
+angular.module('build-status', ['ngResource'])
+	.factory('Builder', ['$resource', function ($resource) {
       //var Repositories = $resource('http://localhost:3000/repositories/1/summary.json:id', {
       //  apiKey:'4fb51e55e4b02e56a67b0b66',
       //  id:'@_id.$oid'
       //});
-    	var Repo = $resource('http://127.0.0.1:3000/repositories/5/summary.json');
+    	var Builder = $resource('http://127.0.0.1:3000/repositories/5/summary.json');
 
       	//Repo.prototype.endpointCount = function() {
         //	return 3;
       	//};
 
-      	return Repo;
+      	return Builder;
     }])
-    .controller('TestResultCtrl', ['$scope', 'Repo', '$resource', function ($scope, Repo, $resource) {
-
-		//This is async and will return a promise which will eventually be populated.
-		//This needs to be able to select the correct repository
-		//var repdata = $resource('http://127.0.0.1:3000/repositories/1/summary.json');
-
-		$scope.repodata = null;
-
-		//$scope.repodata = Repo.query();
-
-		//$scope.urlcount = 2;
-		//Repo.query({}, function(tests){
-		//	$scope.urlcount = tests.length;
-			//alert('Hello');
-    	//});
-
-    	//Better to use promise and the data binding to let ui update automatically
-    	//$scope.urlcount = Repo.query();
-    	$scope.init = function(value) {
-    		$scope.repoUrl = value;
-    		$scope.repodata = $resource($scope.repoUrl).query();
-  		}
-
-		$scope.getPercentComplete = function(doneCount){
-			return (doneCount/$scope.urlcount) * 100;
-		};
-
-	}])
-	.controller('BuildStatusCtrl', ['$scope', '$resource', '$timeout', function ($scope, $resource, $timeout) {
+    .controller('BuildStatusCtrl', ['$scope', 'Builder', '$resource', function ($scope, Builder, $resource) {
 
 		//This is async and will return a promise which will eventually be populated.
 		//This needs to be able to select the correct repository
@@ -62,21 +32,13 @@ angular.module('results-overview', ['ngResource'])
     	//$scope.urlcount = Repo.query();
     	$scope.init = function(value) {
     		$scope.buildUrl = value;
-    		$scope.builddata = $resource($scope.buildUrl);
-    		poll();
+    		$scope.builddata = $resource($scope.buildUrl).query();
   		}
-  		
+
 		$scope.getPercentComplete = function(doneCount){
 			return (doneCount/$scope.urlcount) * 100;
 		};
 
-		$scope.value = 1;
-    	var poll = function() {
-        	$timeout(function() {
-		            	$scope.value++;
-		            	poll();
-		        	 }, 1000);
-    	};
 	}])
 	.directive('barchart', function() {
 

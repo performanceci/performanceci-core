@@ -1,5 +1,5 @@
 export GITHUB_ID=015a6232ecb598df88f8
-export GITHUB_SECRET=251581cc07bc6be8396283d17c686e8c146061bf
-export WEBHOOK_URL=http://77124f9d.ngrok.com
+export GITHUB_SECRET=f9633c56f2430d5b2beb4334d996b571dbdef9f1
+export WEBHOOK_URL=http://37674d.ngrok.com
 export GENERATE_DATA=YES
 bundle exec rails s
