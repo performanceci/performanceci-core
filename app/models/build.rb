@@ -3,6 +3,8 @@ class Build < ActiveRecord::Base
 
   has_many :build_endpoints
 
+  BUILD_STATUSES = %w(waiting building_container attacking_container done failed)
+
   def self.from_payload(payload)
     user = User.find(payload[:user_id])
     repository = user.repositories.find_by_github_id(payload['repository']['id'])

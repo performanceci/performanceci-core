@@ -7,7 +7,21 @@ class BuildsController < ApplicationController
   # GET /builds.json
   def index
     @builds = Build.all
+    respond_to do |format|
+      format.html { render action: 'index' }
+      format.json { render json: @builds.to_json}
+    end
   end
+
+  def ongoing
+    @builds = Build.scoped.select(:id, :build_status, :percent_done)
+    respond_to do |format|
+      format.html { render action: 'index' }
+      format.json { render json: @builds.to_json}
+    end
+
+  end
+
 
   # GET /builds/1
   # GET /builds/1.json
