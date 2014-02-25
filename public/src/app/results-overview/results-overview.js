@@ -226,8 +226,18 @@ angular.module('results-overview', ['ngResource'])
 	                ykeys= ['response_time'],
 	                hideHover= 'auto',
 	                resize= true,
-	                labels= ['Response Time'];
-
+	                labels= ['Response Time'],
+	                goals = [],
+	                goalLineColors = [];
+	            
+	            var maxResponseTime = $scope[attrs.data].max_response_time;
+	            var targetResponseTime = $scope[attrs.data].target_response_time;
+                if(maxResponseTime)
+                {
+                	goals = [maxResponseTime, targetResponseTime];
+                	goalLineColors = ["red", "yellow"];
+                }
+	                
 	            var setData = function(){
 	                Morris.Line({
 				        element: element,
@@ -240,9 +250,9 @@ angular.module('results-overview', ['ngResource'])
 				        parseTime: false,
 				        //xLabelFormat: function (x) { return x.toString(); },
 				        yLabelFormat: function (y) { return y.toString(); },
-				        goals: [1, 0.5],
+				        goals: goals,
 				        goalStrokeWidth: 3,
-				        goalLineColors: ["red", "yellow"],
+				        goalLineColors: goalLineColors,
 				        hoverCallback: function (index, options, content) {
   							var row = options.data[index];
 
