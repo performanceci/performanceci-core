@@ -47,6 +47,13 @@
     border-bottom: 1px solid #e7e7e7;
 }
 
+.page-header {
+    color: #000000;
+    text-shadow: 0 2px 3px rgba(0,0,0,.3);
+}
+
+
+
 /* Navigation */
 
 /* ------------------------------- */
