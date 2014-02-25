@@ -2,11 +2,13 @@
 		<div id="page-wrapper" ng-app="results-overview">
             <div class="row">
                 <div class="col-lg-10">
+                    <% if @repository %>
                     <h2 class="page-header">Repository: <%= @repository.full_name%>
-                        <% if @build %>
-
-                        <% end %>
                     </h2>
+                    <% else %>
+                        <h2 class="page-header">No Repos
+                        </h2>
+                    <% end %>
                     <% if @build %>
                         <div class="panel <%= build_panel_css%>">
                             <div class="panel-heading">
@@ -28,6 +30,7 @@
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
+            <% if @repository %>
             <div class="row">
                 <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)">
                     <h3 class="page-header" ng-hide="!show_status">
@@ -46,7 +49,6 @@
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
-            <% if @repository %>
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-10" ng-controller="TestResultCtrl">
