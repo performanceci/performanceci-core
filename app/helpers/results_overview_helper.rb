@@ -3,8 +3,20 @@ module ResultsOverviewHelper
     perc ? (perc * 100).round(2) : ''
   end
 
-  def format_float(num)
-    num ? num.round(2) : ''
+  def format_response_time(num)
+    num ? (num * 1000).round(0) : ''
+  end
+
+  def thumbs(change)
+    if change
+      if change > 0
+        "<span style='color: red'><i class='fa fa-thumbs-up fa-fw'>/i>#{change} ms</span>"
+      else
+        "<span style='color: red'><i class='fa fa-thumbs-down fa-fw'></i>#{change.abs} ms</span>"
+      end
+    else
+      ''
+    end
   end
 
   def build_panel_css

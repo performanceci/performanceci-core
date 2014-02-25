@@ -10,7 +10,7 @@ class ResultsOverviewController < ApplicationController
     if params[:repository_id]
       @repository = Repository.find(params[:repository_id])
     else
-      @repository = Repository.first
+      @repository = current_user.repositories.first
     end
     if @repository
       @build = @repository.last_build
