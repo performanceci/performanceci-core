@@ -3,7 +3,7 @@ class Build < ActiveRecord::Base
 
   has_many :build_endpoints
 
-  scope :ongoing, -> { where("build_status NOT IN(?)", %w(success failed error))}
+  scope :ongoing, -> { where("build_status NOT IN(?)", %w(success failed warn error))}
 
   BUILD_STATUSES = %w(pending building_container attacking_container success failed warn error)
 
