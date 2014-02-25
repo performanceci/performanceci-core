@@ -43,8 +43,8 @@ class Build < ActiveRecord::Base
     max_response_time = options[:max_response_time]
     target_response_time = options[:target_response_time]
     if endpoint
-      if endpoint.max_response_time != max_response_time ||
-        endpoint.target_response_time != target_response_time ||
+      if ( endpoint.max_response_time != max_response_time ||
+        endpoint.target_response_time != target_response_time )
         endpoint.update_attributes! max_response_time: max_response_time,
           target_response_time: target_response_time
       end
