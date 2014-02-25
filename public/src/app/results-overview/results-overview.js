@@ -37,6 +37,57 @@ angular.module('results-overview', ['ngResource'])
     		$scope.repodata = $resource($scope.repoUrl).query();
   		}
 
+  		$scope.isTrendGood = function(endpointdata) {
+  			var samples = endpointdata.builds;
+  			//alert("samples: " + samples.length );
+  			if(samples.length > 1)
+  			{
+  				return (samples[samples.length-1].response_time <= samples[samples.length-2].response_time);
+  			}
+  			else
+  			{
+  				return true;
+  			}
+  		}
+
+  		$scope.lastBuildMin = function(endpointdata) {
+  			var samples = endpointdata.builds;
+  			var output = "";
+  			//alert("samples: " + samples.length );
+  			if(samples.length > 0){
+
+  				var now = new Date();
+  				var lastSample = new Date(samples[samples.length-1].created_at);
+				var diff = now - lastSample;
+
+				var residual = diff/1000;
+				if(residual > 60){ 
+					//Min
+					residual = residual/60;
+					if(residual > 60){
+						//Hours
+						residual = residual/60;
+						if(residual > 24){
+							residual = residual/24;
+							output = Math.round(residual) + " days ago";
+						}
+						else{
+							output = Math.round(residual) + " hrs ago";
+						}
+
+					}
+					else{
+						output = Math.round(residual) + " min ago";
+					}
+				}
+				else{
+					output = Math.round(residual) + " seconds ago";
+				}
+  			}
+  			
+  			return output;
+  		};
+
 		$scope.getPercentComplete = function(doneCount){
 			return (doneCount/$scope.urlcount) * 100;
 		};
@@ -93,7 +144,7 @@ angular.module('results-overview', ['ngResource'])
 			            							if($scope.show_status == false){
 			            								$scope.show_status = true;
 			            							}
-			            							$scope.build_status = data.build_status;
+			            							$scope.build_status = data.status_message;
 			            							$scope.build_percent = data.percent_done;
 			            						}
 			            						else
@@ -187,6 +238,8 @@ angular.module('results-overview', ['ngResource'])
 				        hideHover: hideHover,
 				        resize: resize,
 				        parseTime: false,
+				        //xLabelFormat: function (x) { return x.toString(); },
+				        yLabelFormat: function (y) { return y.toString(); },
 				        goals: [1, 0.5],
 				        goalStrokeWidth: 3,
 				        goalLineColors: ["red", "yellow"],
@@ -205,6 +258,7 @@ angular.module('results-overview', ['ngResource'])
 						//window.open();
 						window.open(data[i].compare,"_blank","toolbar=yes, scrollbars=yes, resizable=yes, top=50, left=500, width=800, height=600");
  					});
+ 					//$('svg').height(500);
 	            };
 
 	            attrs.$observe('data',setData); //lets just observe only the data because it is bad to use many observers, anyway this won't work without supplied data
