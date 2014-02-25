@@ -75,44 +75,43 @@
                     <!-- /.col-lg-10 -->
                     <div class="col-lg-2">
                         <!-- Start here -->
-                        <div class="chat-panel panel panel-default">
+                        <div class=" panel panel-default">
                             <div class="panel-heading">
-                                <i class="fa fa-comments fa-fw"></i>
-                                Last Status
+                                <i class="fa fa-plus-square fa-fw"></i>
+                                Trend
                             </div>
                             <!-- /.panel-heading -->
                             <div class="panel-body">
                                 <ul class="chat">
-                                    <li class="left clearfix">
+                                    <li class="left clearfix" style="border-bottom: 1px" ng-show="isTrendGood(endpointdata)">
                                         <span class="chat-img pull-left">
                                             <i class="fa fa-thumbs-o-up fa-3x fa-fw" style="color:green"></i>
                                         </span>
                                         <div class="chat-body clearfix">
                                             <div class="header">
-                                                <strong class="primary-font">Built</strong> 
                                                 <small class="pull-right text-muted">
-                                                    <i class="fa fa-clock-o fa-fw"></i> 12 mins ago
+                                                    <i class="fa fa-clock-o fa-fw"></i> {{lastBuildMin(endpointdata)}}
                                                 </small>
-                                            </div>
-                                            <p>
-                                                Some build text
-                                            </p>
+                                            </div>                                    
                                         </div>
+                                        <p>
+                                        Page or API endpoint response time is improving
+                                        </p>
                                     </li>
-                                    <li class="right clearfix">
+                                    <li class="right clearfix" style="border-bottom: 1px" ng-hide="isTrendGood(endpointdata)">
                                         <span class="chat-img pull-right">
                                             <i class="fa fa-thumbs-o-down fa-3x fa-fw" style="color:red"></i>
                                         </span>
                                         <div class="chat-body clearfix">
                                             <div class="header">
-                                                <small class=" text-muted">
-                                                    <i class="fa fa-clock-o fa-fw"></i> 13 mins ago</small>
-                                                <strong class="pull-right primary-font">Built</strong>
+                                                <small class="pull-left text-muted">
+                                                    <i class="fa fa-clock-o fa-fw"></i> {{lastBuildMin(endpointdata)}}
+                                                </small>
                                             </div>
-                                            <p>
-                                                More build text
-                                            </p>
                                         </div>
+                                        <p>
+                                        Page or API endpoint <strong>response time is degrading</strong>
+                                        </p>
                                     </li>
                                 </ul>
                             </div>
