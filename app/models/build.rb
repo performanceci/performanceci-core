@@ -40,6 +40,15 @@ class Build < ActiveRecord::Base
   def add_endpoint(url, headers, options = {})
     # Add other options to where clause to make them unique endpoints
     endpoint = repository.endpoints.where(url: url).first
+    max_response_time = options[:max_response_time]
+    target_response_time = options[:target_response_time]
+    if endpoint
+      if ( endpoint.max_response_time != max_response_time ||
+        endpoint.target_response_time != target_response_time )
+        endpoint.update_attributes! max_response_time: max_response_time,
+          target_response_time: target_response_time
+      end
+    end
     unless endpoint
       endpoint = Endpoint.create!({repository: repository, url: url,
         headers: JSON.generate(headers)}.merge(options))
@@ -61,6 +70,10 @@ class Build < ActiveRecord::Base
     end
   end
 
+  def build_status_message
+    Build.message_for_status(build_status)
+  end
+
   def endpoint_benchmark(endpoint, average_response, score, data)
     #TODO: Move this to endpoint model with easier API
     build_endpoints.create!(
@@ -70,7 +83,6 @@ class Build < ActiveRecord::Base
       endpoint: endpoint,
       build: self)
   end
-
 
   def mark_endpoint_error(endpoint, error_message = "")
     build_endpoints.create!(
@@ -112,7 +124,7 @@ class Build < ActiveRecord::Base
     when :warn
       "Build Warning: Endpoint exceeded target response time"
     when :error
-      "Build Error: #{error_message}"
+      "Build Crapped Out"
     else
       "Unknown"
     end

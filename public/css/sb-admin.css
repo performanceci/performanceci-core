@@ -30,13 +30,29 @@
     }
 }
 
+.nav {
+    text-shadow: 0 1px 1px rgba(0,0,0,.1);
+}
+
 .navbar {
     background-color: #333;
+}
+
+.navbar-right {
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    color: #ddd;
 }
 
 .navbar-static-side ul li {
     border-bottom: 1px solid #e7e7e7;
 }
+
+.page-header {
+    color: #000000;
+    text-shadow: 0 2px 3px rgba(0,0,0,.3);
+}
+
+
 
 /* Navigation */
 
@@ -55,6 +71,7 @@
 .navbar-top-links li a {
     padding: 15px;
     min-height: 50px;
+    color: #ddd;
 }
 
 .navbar-top-links .dropdown-menu li {

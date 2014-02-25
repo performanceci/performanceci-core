@@ -38,9 +38,14 @@ class DockerWorker < Worker
       # Read endpoints from perfci.yaml
       conf = File.read("#{workspace}/.perfci.yaml")
       yaml_hash = YAML.load(conf)
-      build.configure_build(yaml_hash)
-      endpoints = (yaml_hash['endpoints'] || []).map do |endpoint|
-        endpoint['uri']
+      endpoints = (yaml_hash['endpoints'] || []).map { |endpoint| endpoint }
+      build_endpoints = endpoints.map do |endpoint|
+        build.add_endpoint(
+          endpoint['uri'],
+          {},
+          :max_response_time    => (endpoint['max_response_time']    || 0.01),
+          :target_response_time => (endpoint['target_response_time'] || 0.001)
+        )
       end
 
       at(2, 9, "Building container")
@@ -53,6 +58,7 @@ class DockerWorker < Worker
 
       at(4, 9, "Signaling KillaBeez")
       build.update_status(:attacking_container, 40)
+      endpoints = endpoints.map { |e| e['uri'] }
       job_ids = 6.times.collect do
           KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
       end
@@ -71,7 +77,7 @@ class DockerWorker < Worker
       begin
         latency = []
         count = 0
-        endpoints.each do |endpoint|
+        build_endpoints.each do |endpoint|
           latencies = statuses.map { |lat|  lat[count] }
           latency[count] = latencies.reduce(:+)
           latency[count] = latency[count] / 6

@@ -2,25 +2,46 @@
 		<div id="page-wrapper" ng-app="results-overview">
             <div class="row">
                 <div class="col-lg-10">
+                    <% if @repository %>
                     <h2 class="page-header">Repository: <%= @repository.full_name%>
-                        <% if @build %>
-                            <p>Build Status: <%=@build.build_status %></p>
-                            <% if @build.build_status == 'error' %>
-                                <% if @build.error_message %>
-                                    <p>Build Error: <%=@build.error_message %></p>
-                                <% end %>
-                            <% else %>
-                                <p>Average Response: <%=@build.average_response %></p>
-                                <p>Percent Change: <%=@build.percent_change %></p>
-                                <p>Total Endpoints: <%=@build.build_endpoints.count %></p>
-                            <% end %>
-                        <% end %>
                     </h2>
-
+                    <% else %>
+                        <h2 class="page-header">No Repos
+                        </h2>
+                    <% end %>
+                    <% if @build %>
+                        <div class="panel <%= build_panel_css%>">
+                            <div class="panel-heading">
+                                <p><%=@build.build_status_message %></p>
+                            </div>
+                            <div class="panel-body">
+                                <% if @build.build_status == 'error' %>
+                                    <% if @build.error_message %>
+                                        <h4>Build Error: <%=@build.error_message %></h4>
+                                    <% end %>
+                                <% else %>
+                                    <table>
+                                        <tr>
+                                            <td style='width:180px'><h4>Average Response:</h4></td>
+                                            <td style='width:130px'><h4><%= format_response_time @build.average_response %> ms</h4></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h4>Trend:</h4></td>
+                                            <td><h4><%= thumbs(format_response_time(@build.percent_change)).html_safe %></h4></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h4>Total Endpoints:</h4></td>
+                                            <td><h4><%=@build.build_endpoints.count %></h4></td>
+                                        </tr>
+                                    </table>
+                                <% end %>
+                            </div>
+                        </div>
+                    <% end %>
                 </div>
-
                 <!-- /.col-lg-12 -->
             </div>
+            <% if @repository %>
             <div class="row">
                 <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)">
                     <h3 class="page-header" ng-hide="!show_status">
@@ -39,7 +60,6 @@
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
-            <% if @repository %>
             <!-- /.row -->
             <div ng-controller="TestResultCtrl">
                 <div ng-init="init('/repositories/<%= @repository.id%>/summary.json')"></div>
