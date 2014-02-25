@@ -10,7 +10,7 @@ module ResultsOverviewHelper
   def thumbs(change)
     if change
       if change < 0
-        "<span style='color: red'><i class='fa fa-thumbs-up fa-fw'></i>#{change.abs} %</span>"
+        "<span style='color: green'><i class='fa fa-thumbs-up fa-fw'></i>#{change.abs} %</span>"
       else
         "<span style='color: red'><i class='fa fa-thumbs-down fa-fw'></i>#{change.abs} %</span>"
       end
