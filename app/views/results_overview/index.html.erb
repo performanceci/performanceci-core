@@ -20,9 +20,20 @@
                                         <h4>Build Error: <%=@build.error_message %></h4>
                                     <% end %>
                                 <% else %>
-                                    <h4>Average Response: <%= format_float @build.average_response %></h4>
-                                    <h4>Percent Change: <%= format_percent @build.percent_change %> %</h4>
-                                    <h4>Total Endpoints: <%=@build.build_endpoints.count %></h4>
+                                    <table>
+                                        <tr>
+                                            <td style='width:180px'><h4>Average Response:</h4></td>
+                                            <td style='width:130px'><h4><%= format_response_time @build.average_response %> ms</h4></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h4>Trend:</h4></td>
+                                            <td><h4><%= thumbs(format_response_time(@build.percent_change)).html_safe %></h4></td>
+                                        </tr>
+                                        <tr>
+                                            <td><h4>Total Endpoints:</h4></td>
+                                            <td><h4><%=@build.build_endpoints.count %></h4></td>
+                                        </tr>
+                                    </table>
                                 <% end %>
                             </div>
                         </div>
