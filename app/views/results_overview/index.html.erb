@@ -15,12 +15,12 @@
                             <div class="panel-body">
                                 <% if @build.build_status == 'error' %>
                                     <% if @build.error_message %>
-                                        <p>Build Error: <%=@build.error_message %></p>
+                                        <h4>Build Error: <%=@build.error_message %></h4>
                                     <% end %>
                                 <% else %>
-                                    <p>Average Response: <%= format_float @build.average_response %></p>
-                                    <p>Percent Change: <%= format_percent @build.percent_change %> %</p>
-                                    <p>Total Endpoints: <%=@build.build_endpoints.count %></p>
+                                    <h4>Average Response: <%= format_float @build.average_response %></h4>
+                                    <h4>Percent Change: <%= format_percent @build.percent_change %> %</h4>
+                                    <h4>Total Endpoints: <%=@build.build_endpoints.count %></h4>
                                 <% end %>
                             </div>
                         </div>
