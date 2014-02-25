@@ -39,17 +39,16 @@ class Build < ActiveRecord::Base
   #      in case some of them don't come back
   def add_endpoint(url, headers, options = {})
     # Add other options to where clause to make them unique endpoints
-    endpoint = repository.endpoints.where(url: url)
+    endpoint = repository.endpoints.where(url: url).first
     max_response_time = options[:max_response_time]
     target_response_time = options[:target_response_time]
-    if max_response_time
-      endpoint = endpoint.where(max_response_time: max_response_time)
+    if endpoint
+      if endpoint.max_response_time != max_response_time ||
+        endpoint.target_response_time != target_response_time ||
+        endpoint.update_attributes! max_response_time: max_response_time,
+          target_response_time: target_response_time
+      end
     end
-    if target_response_time
-      endpoint = endpoint.where(target_response_time: target_response_time)
-    end
-    endpoint = endpoint.first
-
     unless endpoint
       endpoint = Endpoint.create!({repository: repository, url: url,
         headers: JSON.generate(headers)}.merge(options))
