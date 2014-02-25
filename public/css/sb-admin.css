@@ -32,7 +32,6 @@
 
 .nav {
     text-shadow: 0 1px 1px rgba(0,0,0,.1);
-    background-color: #333;
 }
 
 .navbar-right {
@@ -61,6 +60,7 @@
 .navbar-top-links li a {
     padding: 15px;
     min-height: 50px;
+    color: #ddd;
 }
 
 .navbar-top-links .dropdown-menu li {
