@@ -50,10 +50,22 @@ class DockerWorker < Worker
 
       at(2, 9, "Building container")
       build.update_status(:building_container, 20)
-      image = Docker::Image.build_from_dir(workspace)
+      begin
+        image = Docker::Image.build_from_dir(workspace)
+      rescue Docker::Error => e
+        puts "Error: #{e}"
+        build.mark_build_error
+        return
+      end
 
       at(3, 9, "Running container")
-      container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
+      begin
+        container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
+      rescue Shell::Error => e
+        puts "Error: #{e}"
+        build.mark_build_error
+        return
+      end
       container = Docker::Container.get(container_id)
 
       at(4, 9, "Signaling KillaBeez")
