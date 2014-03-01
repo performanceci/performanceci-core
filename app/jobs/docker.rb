@@ -30,7 +30,7 @@ class DockerWorker < Worker
       # Check for Dockerfile and perfci.yaml
       ['Dockerfile', '.perfci.yaml'].each do |file|
         if !File.exists? "#{workspace}/#{file}"
-          build.mark_build_error
+          build.mark_build_error("#{file} does not exist")
           return
         end
       end
@@ -54,7 +54,7 @@ class DockerWorker < Worker
         image = Docker::Image.build_from_dir(workspace)
       rescue Docker::Error => e
         puts "Error: #{e}"
-        build.mark_build_error
+        build.mark_build_error(e.backtrace)
         return
       end
 
@@ -63,7 +63,7 @@ class DockerWorker < Worker
         container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
       rescue Shell::Error => e
         puts "Error: #{e}"
-        build.mark_build_error
+        build.mark_build_error(e.backtrace)
         return
       end
       container = Docker::Container.get(container_id)
@@ -100,7 +100,7 @@ class DockerWorker < Worker
         puts "Error: #{e}"
         puts "Type: #{e.inspect}"
         container.kill
-        build.mark_build_error
+        build.mark_build_error(e.backtrace)
         return
         raise e
       end

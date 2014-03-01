@@ -31,8 +31,8 @@ class Build < ActiveRecord::Base
       percent_change: pct_change)
   end
 
-  def mark_build_error
-    self.update_attributes! build_status: :error
+  def mark_build_error(message = nil)
+    self.update_attributes! build_status: :error, error_message: message
   end
 
   #TODO: prob need to add build endpoints here and then update them later
@@ -90,7 +90,7 @@ class Build < ActiveRecord::Base
       score: 0,
       data: [].to_json,
       endpoint: endpoint,
-      error_message: error_message,
+      #error_message: error_message,  #TODO
       status: :error,
       build: self)
   end
