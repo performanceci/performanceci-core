@@ -53,7 +53,7 @@ class DockerWorker < Worker
       begin
         image = Docker::Image.build_from_dir(workspace)
       rescue Docker::Error => e
-        puts "Error: #{e}"
+        puts "Error: #{e.backtrace}"
         build.mark_build_error(e.backtrace)
         return
       end
@@ -62,7 +62,7 @@ class DockerWorker < Worker
       begin
         container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
       rescue Shell::Error => e
-        puts "Error: #{e}"
+        puts "Error: #{e.backtrace}"
         build.mark_build_error(e.backtrace)
         return
       end
@@ -98,7 +98,7 @@ class DockerWorker < Worker
         end
       rescue Exception => e
         puts "Error: #{e}"
-        puts "Type: #{e.inspect}"
+        puts "Type: #{e.backtrace}"
         container.kill
         build.mark_build_error(e.backtrace)
         return
