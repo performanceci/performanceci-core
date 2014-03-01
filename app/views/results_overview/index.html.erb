@@ -8,6 +8,10 @@
                     <% else %>
                         <h2 class="page-header">No Repos
                         </h2>
+                        <div class="row col-lg-4">
+                            <%= link_to 'Add Repository', new_repository_path, :class => "btn btn-lg btn-success btn-block" %>
+                        </div>
+
                     <% end %>
                     <% if @build %>
                         <div class="panel <%= build_panel_css%>">
@@ -37,6 +41,8 @@
                                 <% end %>
                             </div>
                         </div>
+                    <% else %>
+                      <h3>Repository is ready to go! <br /><br />Push some new commits and we'll get going...</h3>
                     <% end %>
                 </div>
                 <!-- /.col-lg-12 -->
