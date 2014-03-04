@@ -1,4 +1,3 @@
-require_relative 'Worker/worker'
 require 'net/http'
 
 class KillaBeez < Worker
