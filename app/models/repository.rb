@@ -18,6 +18,27 @@ class Repository < ActiveRecord::Base
     save
   end
 
+  def build_from_last_commit
+    commits = user.github_client.commits(full_name)
+    last_commit = commits[0]
+    previous_commit = commits[1]
+    previous_sha = previous_commit.sha
+    last_sha = last_commit.sha
+    compare = "https://github.com/akira/testhook/compare/#{previous_sha[0..11]}...#{last_sha[0..11]}"
+    if last_commit && previous_commit
+      build = Build.create!(
+        payload: '{}',
+        build_status: 'pending',
+        before:  previous_sha,
+        after: last_sha,
+        message: last_commit.commit.message,
+        compare: compare,
+        url: "https://github.com/#{self.full_name}.git",
+        repository: self)
+      build.run_build
+    end
+  end
+
   def build_summary
     builds = self.builds.order('created_at desc').limit(20).includes(:build_endpoints)
     build_endpoints = builds.flat_map { |b| b.build_endpoints }
