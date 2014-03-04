@@ -30,9 +30,6 @@ Performanceci::Application.routes.draw do
   post '/webhooks/:user_id' => 'webhooks#hook'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
-     get 'jobtest' => 'job_test#swarm'
-
-  get 'dockerjob' => 'job_test#docker'
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
 
