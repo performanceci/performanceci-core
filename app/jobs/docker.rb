@@ -1,6 +1,4 @@
-require_relative 'Worker/worker'
-require_relative 'killabeez'
-ENV['DOCKER_URL'] = 'unix:///var/run/docker.sock'
+
 require 'fileutils'
 require 'docker'
 require 'git'
@@ -10,13 +8,21 @@ class DockerWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
     def perform
+      unless ENV['DOCKER_URL']
+        ENV['DOCKER_URL'] = 'unix:///var/run/docker.sock'
+      end
+      Docker.url = ENV['DOCKER_URL']
 
       build = Build.find(options['build_id'])
       url   = build.url
       repo  = build.repository.full_name
-      root  = ENV['WORKSPACE'] || '/var/cache/workspace'
+      root  = ENV['WORKSPACE'] || Dir.tmpdir
       host  = ENV['HOST']      || 'localhost'
-      port  = rand(8000..8999)
+      if ENV['EXPORT_PORT']
+        port = ENV['EXPORT_PORT']
+      else
+        port  = rand(8000..8999)
+      end
 
       base      = "#{root}/#{build.id}"
       workspace = "#{base}/#{repo}"
@@ -72,7 +78,7 @@ class DockerWorker < Worker
       build.update_status(:attacking_container, 40)
       endpoints = endpoints.map { |e| e['uri'] }
       job_ids = 6.times.collect do
-          KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
+        KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
       end
 
       at(5, 9, "Collecting data")
