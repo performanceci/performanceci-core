@@ -1,4 +1,4 @@
-require_relative '../jobs/docker.rb'
+
 class WebhooksController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
@@ -8,11 +8,7 @@ class WebhooksController < ApplicationController
     if ENV['GENERATE_DATA']
       build.generate_fake_data(10)
     end
-    DockerWorker.create(
-      :url => build.url,
-      :repo => build.repository.name,
-      :build_id => build.id
-    )
+    build.run_build
     render :text => 'OK', :status => 200
   end
 end

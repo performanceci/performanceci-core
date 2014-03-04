@@ -21,6 +21,14 @@ class Build < ActiveRecord::Base
       repository: repository)
   end
 
+  def run_build
+    DockerWorker.create(
+      :url => url,
+      :repo => repository.name,
+      :build_id => id
+    )
+  end
+
   def mark_build_finished
     average = average_response_from_endpoints
     status = status_from_endpoints
