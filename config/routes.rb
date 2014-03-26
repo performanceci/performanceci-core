@@ -20,10 +20,14 @@ Performanceci::Application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: "omniauth_callbacks" }
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
-  resources :users
+  resources :users do
+    member do
+      get :local_login
+    end
+  end
 
   # You can have the root of your site routed with "root"
-  root 'landings#redirects'
+  root 'results_overview#index'
 
   # Example of regular route:
 
