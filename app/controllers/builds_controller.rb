@@ -14,7 +14,7 @@ class BuildsController < ApplicationController
   end
 
   def ongoing
-    @builds = Build.ongoing.select(:id, :repository_id, :build_status, :percent_done)
+    @builds = Build.ongoing.newish.select(:id, :repository_id, :build_status, :percent_done)
     #TODO - move this to JSON serializer
     @builds = @builds.map do |build|
       attribs = build.attributes
