@@ -1,6 +1,7 @@
 class RepositoriesController < ApplicationController
   before_filter :authenticate_user!
 
+  protect_from_forgery except: [:build_latest]
   before_action :set_repository, only: [:show, :edit, :update, :destroy]
 
   # GET /repositories
@@ -13,6 +14,12 @@ class RepositoriesController < ApplicationController
   # GET /repositories/1.json
   def show
 
+  end
+
+  def build_latest
+    @repository = current_user.repositories.find(params[:id])
+    build = @repository.build_from_last_commit
+    render json: build
   end
 
   def summary

@@ -12,6 +12,7 @@ Performanceci::Application.routes.draw do
   resources :repositories do
     member do
       get 'summary'
+      put 'build_latest'
     end
   end
 

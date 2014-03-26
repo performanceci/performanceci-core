@@ -50,6 +50,17 @@
             <% if @repository %>
             <div class="row">
                 <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)">
+                    <div>
+                        <h3>Or to trigger manually: </h3>
+                        <div class="row col-lg-4">
+                          <br />
+                          <a href='#' class="btn btn-lg btn-success btn-block" ng-click="buildLatest(<%= @repository.id %>)">Build Latest</a>
+                          <br />
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+
                     <h3 class="page-header" ng-hide="!show_status">
                     <div>
                         <p>

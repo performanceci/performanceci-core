@@ -6,13 +6,13 @@ angular.module('results-overview', ['ngResource'])
       //  apiKey:'4fb51e55e4b02e56a67b0b66',
       //  id:'@_id.$oid'
       //});
-    	var Repo = $resource('http://127.0.0.1:3000/repositories/5/summary.json');
+    	var Repo = $resource('/repositories/5/summary.json');
 
       	//Repo.prototype.endpointCount = function() {
         //	return 3;
       	//};
 
-      	return Repo;
+      return Repo;
     }])
     .controller('TestResultCtrl', ['$scope', 'Repo', '$resource', function ($scope, Repo, $resource) {
 
@@ -61,7 +61,7 @@ angular.module('results-overview', ['ngResource'])
 				var diff = now - lastSample;
 
 				var residual = diff/1000;
-				if(residual > 60){ 
+				if(residual > 60){
 					//Min
 					residual = residual/60;
 					if(residual > 60){
@@ -84,7 +84,7 @@ angular.module('results-overview', ['ngResource'])
 					output = Math.round(residual) + " seconds ago";
 				}
   			}
-  			
+
   			return output;
   		};
 
@@ -93,7 +93,13 @@ angular.module('results-overview', ['ngResource'])
 		};
 
 	}])
-	.controller('BuildStatusCtrl', ['$scope', '$resource', '$timeout', function ($scope, $resource, $timeout) {
+  .factory('Repository', ['$resource',
+    function($resource){
+      return $resource('repositories/:id.json', {}, {
+        buildLatest: { method:'PUT', params:{id:'@id'}, url: 'repositories/:id/build_latest.json', isArray:false }
+      });
+    }])
+	.controller('BuildStatusCtrl', ['$scope', '$resource', '$timeout', 'Repository', function ($scope, $resource, $timeout, Repository) {
 
 		$scope.ongoingUrl = null;
 		$scope.repoId = null;
@@ -120,10 +126,14 @@ angular.module('results-overview', ['ngResource'])
     		$scope.builddataquery = $resource($scope.ongoingUrl);
     		poll();
   		}
-  		
-		$scope.getPercentComplete = function(doneCount){
-			return (doneCount/$scope.urlcount) * 100;
-		};
+
+      $scope.buildLatest = function(repoId) {
+        Repository.buildLatest({id: repoId});
+      }
+
+  		$scope.getPercentComplete = function(doneCount){
+  			return (doneCount/$scope.urlcount) * 100;
+  		};
 
     	var poll = function() {
         	$timeout(function() {
@@ -140,7 +150,7 @@ angular.module('results-overview', ['ngResource'])
 												//expect(card instanceof CreditCard).toEqual(true);
 												//card.name = "J. Smith";);
 			            						if( data )
-			            						{	
+			            						{
 			            							if($scope.show_status == false){
 			            								$scope.show_status = true;
 			            							}
@@ -229,7 +239,7 @@ angular.module('results-overview', ['ngResource'])
 	                labels= ['Response Time'],
 	                goals = [],
 	                goalLineColors = [];
-	            
+
 	            var maxResponseTime = $scope[attrs.data].max_response_time;
 	            var targetResponseTime = $scope[attrs.data].target_response_time;
                 if(maxResponseTime)
@@ -237,7 +247,7 @@ angular.module('results-overview', ['ngResource'])
                 	goals = [maxResponseTime, targetResponseTime];
                 	goalLineColors = ["red", "yellow"];
                 }
-	                
+
 	            var setData = function(){
 	                Morris.Line({
 				        element: element,
