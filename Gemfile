@@ -6,7 +6,7 @@ gem 'rails', '4.0.3'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # PostgreSQL for production
-gem 'pg'
+gem 'pg', group: :production
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'
@@ -31,6 +31,7 @@ gem 'jbuilder', '~> 1.2'
 
 
 #=========================================
+gem "active_model_serializers"
 gem 'devise', '3.1.0'
 gem 'execjs'
 gem 'therubyracer', :platforms => :ruby
@@ -58,6 +59,12 @@ gem 'resque'
 gem 'resque-status'
 
 gem 'seed_dump'
+
+group :test, :development do
+  gem 'capybara'
+  gem 'factory_girl_rails'
+  gem 'rspec-rails'
+end
 
 
 group :doc do
