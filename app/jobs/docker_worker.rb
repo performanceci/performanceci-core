@@ -31,8 +31,16 @@ class DockerWorker < Worker
       build.update_status(:pending, 0)
       FileUtils.rm_r base if Dir.exists? base
 
-      at(1, 9, "Cloning Repo")
-      Git.clone(url, workspace)
+
+      if ENV['LOCAL_WORKSPACE']
+        Worker.system_quietly("mkdir #{base}")
+        workspace = base + "/" + ENV['LOCAL_WORKSPACE'].split('/').last
+        Worker.system_quietly("cp -R #{ENV['LOCAL_WORKSPACE']} #{workspace}")
+        at(1, 9, "cp -R #{ENV['LOCAL_WORKSPACE']} #{workspace}")
+      else
+        at(1, 9, "Cloning Repo")
+        Git.clone(url, workspace)
+      end
       # Check for Dockerfile and perfci.yaml
       ['Dockerfile', '.perfci.yaml'].each do |file|
         if !File.exists? "#{workspace}/#{file}"
