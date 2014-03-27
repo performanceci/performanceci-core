@@ -21,7 +21,7 @@
                             <div class="panel-body">
                                 <% if @build.build_status == 'error' %>
                                     <% if @build.error_message %>
-                                        <h4>Build Error: <%=@build.error_message %></h4>
+                                        <div style='font-size:11px;font-style:courier;'>Build Error: <%=@build.error_message.gsub("\n", "<br />").gsub('",', "<br />").html_safe if @build.error_message %></div>
                                     <% end %>
                                 <% else %>
                                     <table>
