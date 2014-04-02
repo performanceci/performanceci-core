@@ -3,6 +3,7 @@ require 'fileutils'
 require 'docker'
 require 'git'
 require 'yaml'
+require 'shell'
 
 class DockerWorker < Worker
     include Resque::Plugins::Status
