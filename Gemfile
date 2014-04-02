@@ -31,7 +31,7 @@ gem 'jbuilder', '~> 1.2'
 
 
 #=========================================
-gem "active_model_serializers"
+#gem "active_model_serializers"
 gem 'devise', '3.1.0'
 gem 'execjs'
 gem 'therubyracer', :platforms => :ruby
