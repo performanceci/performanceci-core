@@ -25,6 +25,7 @@ tmp
 .rbenv*
 notes
 run.sh
+.env
 
 #stuff for vim
 *~

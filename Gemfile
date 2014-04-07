@@ -41,6 +41,8 @@ gem 'therubyracer', :platforms => :ruby
 gem 'docker-api', :require => 'docker'
 gem 'git'
 
+gem 'dotenv-rails', :groups => [:development, :test]
+
 # upgrading to newer versions of these gems caused new github accounts to not be able to
 # sign in / create an account on our side
 gem 'oauth2'

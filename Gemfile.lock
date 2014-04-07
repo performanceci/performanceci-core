@@ -56,6 +56,9 @@ GEM
       archive-tar-minitar
       excon (>= 0.28)
       json
+    dotenv (0.10.0)
+    dotenv-rails (0.10.0)
+      dotenv (= 0.10.0)
     erubis (2.7.0)
     excon (0.31.0)
     execjs (2.0.2)
@@ -220,6 +223,7 @@ DEPENDENCIES
   coffee-rails (~> 4.0.0)
   devise (= 3.1.0)
   docker-api
+  dotenv-rails
   execjs
   factory_girl_rails
   git
