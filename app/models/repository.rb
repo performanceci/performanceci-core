@@ -7,15 +7,32 @@ class Repository < ActiveRecord::Base
   STATUSES = %w(success failed warn error)
 
   def add_hook
-    #repo = user.github_client.repos.find { |r| r.name == name}
-    hook = user.github_client.create_hook(
+    if existing_hook
+      enable_hook(existing_hook)
+    else
+      #repo = user.github_client.repos.find { |r| r.name == name}
+      hook = user.github_client.create_hook(
+        full_name,
+        'web',
+        hook_url_config(user),
+        hook_options
+      )
+      self.hook_id = hook.id
+      save
+    end
+  end
+
+  def existing_hook
+    user.github_client.hooks(full_name).first
+  end
+
+  def enable_hook(hook)
+    user.github_client.edit_hook(
       full_name,
+      hook.id,
       'web',
       hook_url_config(user),
-      hook_options
-    )
-    self.hook_id = hook.id
-    save
+      hook_options)
   end
 
   def build_from_last_commit
