@@ -50,6 +50,7 @@ gem 'omniauth'
 gem 'omniauth-oauth2'
 gem 'omniauth-github'
 gem "octokit", "~> 2.7.1"
+gem "heroku-api"
 
 gem 'angularjs-rails'
 
