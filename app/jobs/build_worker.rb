@@ -1,47 +1,61 @@
-
 class BuildWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
 
     def perform
       paas = nil
-      project_src = nil
+      project_checkout = nil
+      load_tester = nil
+      is_remote = !(ENV['LOCAL_WORKSPACE'] == 'true')
+
       begin
         build = Build.find(options['build_id'])
+        build_results = BuildResult.new(build)
 
-        if remote
-          project_src = GitCheckout.new.retrieve(build.repository.full_name, build.url)
+        if is_remote
+          project_checkout = GitCheckout.new(build.repository.full_name, build.url, build.after)
         else
-          project_src = LocalCheckout.new.retrieve(build.repository.full_name, build.url)
+          project_checkout = LocalCheckout.new(build.repository.full_name, build.url)
+        end
+        unless project_checkout.retrieve
+          raise_execution_error(build_results, project_checkout.errors)
+        end
+        project_src = project_checkout.source_dir
+
+        if build.provider == :docker
+          paas = DockerBuilder.new(project_src)
+        else
+          provider = build.repository.provider
+          paas = HerokuBuilder.new(project_src, provider)
+        end
+        unless paas.build
+          raise_execution_error(build_results, paas.errors)
         end
 
-        account_data = build.account_data
-        if build.provider == :heroku
-          paas = HerokuBuilder.new(project_src, account_data)
-        else
-          paas = DockerBuilder.new(project_src, account_data)
+        test_configuration = ProjectConfiguration.new(project_src)
+        unless test_configuration.parse_configuration
+          raise_execution_error(build_results, test_configuration.errors)
         end
 
-        configuation = ProjectConfiguration.new.parse_configuration(project_src)
-
-        build_result = BuildResult.new(build)
-
-        if configuration.valid?
-          endpoint_tests = HttpLoadTester.new(paas.test_url, configuration)
-          build_result.tests = endpoint_tests
+        load_tester = HttpLoadTester.new(paas.base_test_url, test_configuration)
+        if load_tester.run
+          build_results.test_results = load_tester.test_results
           build_results.save
         else
-          build_results.errors = configuration.errors
-          build_results.save
+          raise_execution_error(build_results, load_tester.errors)
         end
+
       ensure
-        if project_src
-          GitCheckout.new.cleanup(project_src)
-        end
-        if paas
-          paas.destroy
-        end
+        project_checkout.cleanup if project_checkout
+        paas.cleanup if paas
+        load_tester.cleanup if load_tester
       end
+    end
+
+    def raise_execution_error(build_results, errors)
+      build_results.add_errors(errors)
+      build_results.save
+      raise Exception.new(errors.to_s)
     end
 
       # checkout project from git / gitlab / local etc

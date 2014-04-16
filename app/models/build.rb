@@ -8,6 +8,11 @@ class Build < ActiveRecord::Base
 
   BUILD_STATUSES = %w(pending building_container attacking_container success failed warn error)
 
+  #TODO: Fill this out
+  def provider
+    :local
+  end
+
   def self.from_payload(payload)
     user = User.find(payload[:user_id])
     repository = user.repositories.find_by_github_id(payload['repository']['id'])
