@@ -3,6 +3,13 @@ require 'spec_helper'
 describe BuildWorker do
   let!(:build) { Build.create(:repository => Repository.create!) }
 
+  let(:configuration) do
+    { :port => '1234' }
+  end
+
+  before do
+    ProjectConfiguration.any_instance.stub(:configuration).and_return(configuration)
+  end
 
   describe "error scenarios" do
     it "should handle failed to checkout" do
@@ -18,6 +25,7 @@ describe BuildWorker do
 
     it "should handle failed paas build" do
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
+      ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(true)
       HerokuBuilder.any_instance.should_receive(:build).and_return(false)
       GitCheckout.any_instance.should_receive(:cleanup)
       HerokuBuilder.any_instance.should_receive(:cleanup)
@@ -31,11 +39,9 @@ describe BuildWorker do
 
     it "should handle failed project configuration" do
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
-      HerokuBuilder.any_instance.should_receive(:build).and_return(true)
       ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(false)
 
       GitCheckout.any_instance.should_receive(:cleanup)
-      HerokuBuilder.any_instance.should_receive(:cleanup)
 
       BuildResult.any_instance.should_receive(:add_errors)
       BuildResult.any_instance.should_receive(:save)
