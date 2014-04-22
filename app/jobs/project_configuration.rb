@@ -1,3 +1,4 @@
+require 'yaml'
 class ProjectConfiguration
   DEFAULT_MAX_RESP = 0.3
   DEFAULT_TARGET_RESP = 0.1
@@ -22,14 +23,19 @@ class ProjectConfiguration
         :target_response_time => (endpoint['target_response_time'] || DEFAULT_TARGET_RESP)
       }
     end
+    port = yaml_hash['port']
+    unless port
+      errors << "Please specify a single 'port' to export"
+      return false
+    end
+    @configuration = {
+      endpoints: endpoints,
+      port: port
+    }
     true
   rescue Exception => e
     puts e
     errors << e.to_s
     false
-  end
-
-  def errors
-    []
   end
 end

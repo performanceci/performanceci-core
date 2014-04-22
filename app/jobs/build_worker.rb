@@ -1,3 +1,4 @@
+#TODO: separate out into other class
 class BuildWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
@@ -22,22 +23,22 @@ class BuildWorker < Worker
         end
         project_src = project_checkout.source_dir
 
+        configuration = ProjectConfiguration.new(project_src)
+        unless configuration.parse_configuration
+          raise_execution_error(build_results, configuration.errors)
+        end
+
         if build.provider == :docker
-          paas = DockerBuilder.new(project_src)
+          paas = DockerBuilder.new(project_src, configuration)
         else
           provider = build.repository.provider
-          paas = HerokuBuilder.new(project_src, provider)
+          paas = HerokuBuilder.new(project_src, provider, configuration)
         end
         unless paas.build
           raise_execution_error(build_results, paas.errors)
         end
 
-        test_configuration = ProjectConfiguration.new(project_src)
-        unless test_configuration.parse_configuration
-          raise_execution_error(build_results, test_configuration.errors)
-        end
-
-        load_tester = HttpLoadTester.new(paas.base_test_url, test_configuration)
+        load_tester = HttpLoadTester.new(paas.base_test_url, configuration)
         if load_tester.run
           build_results.test_results = load_tester.test_results
           build_results.save

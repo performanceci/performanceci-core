@@ -22,4 +22,11 @@ class Worker
       return true
     end
   end
+
+  def self.system_capture(cmd)
+    IO.popen([*cmd, :err=>[:child, :out]]) do |io|
+      result_with_error = io.read
+    end
+  end
+
 end

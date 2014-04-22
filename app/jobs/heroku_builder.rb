@@ -1,6 +1,6 @@
 class HerokuBuilder
 
-  def initialize(project_src, provider)
+  def initialize(project_src, provider, configuration)
   end
 
   def cleanup
