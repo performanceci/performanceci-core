@@ -9,24 +9,16 @@ class DockerWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
     def perform
-      unless ENV['DOCKER_URL']
-        ENV['DOCKER_URL'] = 'unix:///var/run/docker.sock'
-      end
-      Docker.url = ENV['DOCKER_URL']
-
-      build = Build.find(options['build_id'])
-      url   = build.url
-      repo  = build.repository.full_name
-      root  = ENV['WORKSPACE'] || Dir.tmpdir
-      host  = ENV['HOST']      || 'localhost'
-      if ENV['EXPORT_PORT']
-        port = ENV['EXPORT_PORT']
-      else
-        port  = rand(8000..8999)
-      end
-
-      base      = "#{root}/#{build.id}"
-      workspace = "#{base}/#{repo}"
+      build      = Build.find(options['build_id'])
+      url        = build.url
+      repo       = build.repository.full_name
+      root       = ENV['WORKSPACE']   || Dir.tmpdir
+      host       = ENV['HOST']        || 'localhost'
+      port       = ENV['EXPORT_PORT'] || rand(8000..8999)
+      docker_bin = ENV['DOCKER_BIN']  || 'docker'
+      Docker.url = ENV['DOCKER_URL']  || 'unix:///var/run/docker.sock'
+      base       = "#{root}/#{build.id}"
+      workspace  = "#{base}/#{repo}"
 
       at(0, 9, "Cleaning up workspace")
       build.update_status(:pending, 0)
@@ -75,7 +67,7 @@ class DockerWorker < Worker
 
       at(3, 9, "Running container")
       begin
-        container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
+        container_id = Worker.system_quietly("#{docker_bin} run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
       rescue Shell::Error => e
         puts "Error: #{e.backtrace}"
         build.mark_build_error(e.backtrace.to_s)
