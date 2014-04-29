@@ -1,21 +1,24 @@
 development:
-  adapter: postgresql
+  adapter: <%= ENV['DB_ADAPTER'] || 'postgresql' %>
   encoding: unicode
-  database: perfci_development
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
+  database: <%= ENV['DB_NAME'] || 'perfci_development' %>
   pool: 5
-  username: perfci
-  password:
+  username: <%= ENV['DB_USER'] || 'perfci' %>
+  password: <%= ENV['DB_PASS'] || '' %>
 test:
-  adapter: postgresql
+  adapter: <%= ENV['DB_ADAPTER'] || 'postgresql' %>
   encoding: unicode
-  database: perfci_test
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
+  database: <%= ENV['DB_NAME'] || 'perfci_test' %>
   pool: 5
-  username: perfci
-  password:
+  username: <%= ENV['DB_USER'] || 'perfci' %>
+  password: <%= ENV['DB_PASS'] || '' %>
 production:
-  adapter: postgresql
+  adapter: <%= ENV['DB_ADAPTER'] || 'postgresql' %>
   encoding: unicode
-  database: perfci_production
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
+  database: <%= ENV['DB_NAME'] || 'perfci_production' %>
   pool: 5
-  username: perfci
-  password:
+  username: <%= ENV['DB_USER'] || 'perfci' %>
+  password: <%= ENV['DB_PASS'] || '' %>
