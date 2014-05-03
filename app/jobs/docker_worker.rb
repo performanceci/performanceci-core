@@ -12,11 +12,12 @@ class DockerWorker < Worker
       build      = Build.find(options['build_id'])
       url        = build.url
       repo       = build.repository.full_name
-      root       = ENV['WORKSPACE']   || Dir.tmpdir
-      host       = ENV['HOST']        || 'localhost'
-      port       = ENV['EXPORT_PORT'] || rand(8000..8999)
-      docker_bin = ENV['DOCKER_BIN']  || 'docker'
-      Docker.url = ENV['DOCKER_URL']  || 'unix:///var/run/docker.sock'
+      root       = ENV['WORKSPACE']         || Dir.tmpdir
+      host       = ENV['HOST']              || 'localhost'
+      port       = ENV['EXPORT_PORT']       || rand(8000..8999)
+      bmark_num  = ENV['BENCHMARK_WORKERS'] || 6
+      docker_bin = ENV['DOCKER_BIN']        || 'docker'
+      Docker.url = ENV['DOCKER_URL']        || 'unix:///var/run/docker.sock'
       base       = "#{root}/#{build.id}"
       workspace  = "#{base}/#{repo}"
 
@@ -78,7 +79,7 @@ class DockerWorker < Worker
       at(4, 9, "Signaling KillaBeez")
       build.update_status(:attacking_container, 40)
       endpoints = endpoints.map { |e| e['uri'] }
-      job_ids = 6.times.collect do
+      job_ids = bmark_num.times.collect do
         KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
       end
 
