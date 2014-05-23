@@ -13,27 +13,18 @@ class BuildWorker < Worker
         build = Build.find(options['build_id'])
         build_results = BuildResult.new(build)
 
-        if is_remote
-          project_checkout = GitCheckout.new(build.repository.full_name, build.url, build.after)
-        else
-          project_checkout = LocalCheckout.new(build.repository.full_name, build.url)
-        end
+        project_checkout = project_fetcher(build, is_remote)
         unless project_checkout.retrieve
           raise_execution_error(build_results, project_checkout.errors)
         end
         project_src = project_checkout.source_dir
 
-        configuration = ProjectConfiguration.new(project_src)
-        unless configuration.parse_configuration
+        configuration = ProjectConfiguration.from_build_dir(project_src)
+        unless configuration.valid?
           raise_execution_error(build_results, configuration.errors)
         end
 
-        if build.provider == :docker
-          paas = DockerBuilder.new(project_src, configuration)
-        else
-          provider = build.repository.provider
-          paas = HerokuBuilder.new(project_src, provider, configuration)
-        end
+        paas = paas_for_build(build, project_src, configuration)
         unless paas.build
           raise_execution_error(build_results, paas.errors)
         end
@@ -47,9 +38,26 @@ class BuildWorker < Worker
         end
 
       ensure
-        project_checkout.cleanup if project_checkout
-        paas.cleanup if paas
-        load_tester.cleanup if load_tester
+        project_checkout.cleanup rescue nil if project_checkout
+        paas.cleanup rescue nil if paas
+        load_tester.cleanup rescue nil if load_tester
+      end
+    end
+
+    def paas_for_build(build, project_src, configuration)
+      if build.provider == :docker
+        paas = DockerBuilder.new(project_src, configuration)
+      else
+        provider = build.repository.provider
+        paas = HerokuBuilder.new(project_src, provider, configuration)
+      end
+    end
+
+    def project_fetcher(build, is_remote)
+      if is_remote
+        project_checkout = GitCheckout.new(build.repository.full_name, build.url, build.after)
+      else
+        project_checkout = LocalCheckout.new(build.repository.full_name, build.url)
       end
     end
 

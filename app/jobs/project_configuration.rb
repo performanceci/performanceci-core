@@ -3,18 +3,34 @@ class ProjectConfiguration
   DEFAULT_MAX_RESP = 0.3
   DEFAULT_TARGET_RESP = 0.1
 
-  attr_reader :build_dir, :errors, :configuration
+  attr_reader :errors, :configuration
 
-  def initialize(build_dir)
-    @build_dir = build_dir
+  def initialize(config_hash)
     @errors = []
+    if config_hash
+      parse_configuration(config_hash)
+    end
   end
 
-  def parse_configuration
+  def self.from_build_dir(build_dir)
     # Read endpoints from perfci.yaml
     conf = File.read("#{build_dir}/.perfci.yaml")
-    yaml_hash = YAML.load(conf)
-    endpoints = (yaml_hash['endpoints'] || []).map { |endpoint| endpoint }
+    config_hash = YAML.load(conf)
+    ProjectConfiguration.new(config_hash)
+  rescue Exception => e
+    puts e
+    config = ProjectConfiguration.new(nil)
+    config.errors << e.to_s
+  end
+
+  def valid?
+    errors.empty?
+  end
+
+  private
+
+  def parse_configuration(config_hash)
+    endpoints = (config_hash['endpoints'] || [])
     configuration = endpoints.map do |endpoint|
       {
         :uri => endpoint['uri'],
@@ -23,7 +39,7 @@ class ProjectConfiguration
         :target_response_time => (endpoint['target_response_time'] || DEFAULT_TARGET_RESP)
       }
     end
-    port = yaml_hash['port']
+    port = config_hash['port']
     unless port
       errors << "Please specify a single 'port' to export"
       return false
@@ -32,10 +48,8 @@ class ProjectConfiguration
       endpoints: endpoints,
       port: port
     }
-    true
   rescue Exception => e
     puts e
     errors << e.to_s
-    false
   end
 end

@@ -2,13 +2,13 @@ require 'docker'
 require 'shell'
 
 #TEST: invalid startup
-#TODO: stream build logs - add property?
-#TODO: Save output log - add property?
-#TODO: Test single http run
+
+#TODO: stream output log (attach process?)
+#TODO: stream build logs
+#TODO: Curl setup (linked containers etc?)
+#TODO: Test single http run (?)
 #TODO: docker build in docker
 #TODO: Better than random port
-
-#TODO:
 
 #TODO: Split out build & run
 #TODO: Pass in log streamer - stream as it goes
@@ -16,6 +16,8 @@ require 'shell'
 
 #TODO: use hash for project config
 #TODO: factory methods
+#TODO: work out of resque. remove resque status (?)
+#TODO: Reorg into modules / directories
 class DockerBuilder
   attr_reader :src_dir, :image, :errors, :container,
               :host_port, :container_port, :build_logs
@@ -49,6 +51,10 @@ class DockerBuilder
     if container
       @run_logs ||= Worker.system_capture("docker logs #{container.id}".split(' '))
     end
+  end
+
+  def container_name
+    @container.info["Name"].gsub('/', '')
   end
 
   def build_image

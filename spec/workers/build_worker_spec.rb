@@ -25,7 +25,7 @@ describe BuildWorker do
 
     it "should handle failed paas build" do
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
-      ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(true)
+      ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
       HerokuBuilder.any_instance.should_receive(:build).and_return(false)
       GitCheckout.any_instance.should_receive(:cleanup)
       HerokuBuilder.any_instance.should_receive(:cleanup)
@@ -39,7 +39,8 @@ describe BuildWorker do
 
     it "should handle failed project configuration" do
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
-      ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(false)
+      ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
+      ProjectConfiguration.any_instance.should_receive(:valid?).and_return(false)
 
       GitCheckout.any_instance.should_receive(:cleanup)
 
@@ -54,7 +55,7 @@ describe BuildWorker do
     it "should handle failed load test" do
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
       HerokuBuilder.any_instance.should_receive(:build).and_return(true)
-      ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(true)
+      ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
       HttpLoadTester.any_instance.should_receive(:run).and_return(false)
 
       GitCheckout.any_instance.should_receive(:cleanup)
@@ -74,7 +75,7 @@ describe BuildWorker do
   it "should work with successful flow" do
     GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
     HerokuBuilder.any_instance.should_receive(:build).and_return(true)
-    ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(true)
+    ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
     HttpLoadTester.any_instance.should_receive(:run).and_return(true)
     BuildResult.any_instance.should_receive(:save)
     GitCheckout.any_instance.should_receive(:cleanup)
@@ -88,7 +89,7 @@ describe BuildWorker do
       Build.any_instance.should_receive(:provider).and_return(:docker)
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
       DockerBuilder.any_instance.should_receive(:build).and_return(true)
-      ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(true)
+      ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
       HttpLoadTester.any_instance.should_receive(:run).and_return(true)
       BuildResult.any_instance.should_receive(:save)
       GitCheckout.any_instance.should_receive(:cleanup)
@@ -110,7 +111,7 @@ describe BuildWorker do
     it "should work with local checkout" do
       LocalCheckout.any_instance.should_receive(:retrieve).and_return(true)
       HerokuBuilder.any_instance.should_receive(:build).and_return(true)
-      ProjectConfiguration.any_instance.should_receive(:parse_configuration).and_return(true)
+      ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
       HttpLoadTester.any_instance.should_receive(:run).and_return(true)
       BuildResult.any_instance.should_receive(:save)
       LocalCheckout.any_instance.should_receive(:cleanup)

@@ -4,8 +4,7 @@ describe DockerBuilder do
 
   def docker_builder(project_path)
     path = File.join(File.dirname(__FILE__), project_path)
-    project_config = ProjectConfiguration.new(path)
-    project_config.parse_configuration
+    project_config = ProjectConfiguration.from_build_dir(path)
     DockerBuilder.new(path, project_config)
   end
 
@@ -32,11 +31,16 @@ describe DockerBuilder do
     end
 
     it 'should have execute logs' do
+      sleep(1)
       @builder.run_logs.should_not be_empty
     end
 
-    it 'should expose port 5555' do
-      `docker ps | grep "ruby simple" | grep ">5555/tcp"`.chomp.should_not eq('')
+    it 'should have name' do
+      @builder.container_name.should_not be_empty
+    end
+
+    it 'should expose port 4567' do
+      `docker ps | grep "ruby simple" | grep ">4567/tcp"`.chomp.should_not eq('')
     end
 
     describe 'build log' do
