@@ -8,12 +8,12 @@ class VegetaDriver
   DEFAULT_IMAGE_NAME = 'vegeta'
   VEGETA = "vegeta"
 
-  def initialize(options = {})
-    @image_name = options[:image_name] || DEFAULT_IMAGE_NAME
-    if options[:link_container_name]
-      @link_container_name = options[:link_container_name]
-    elsif options[:base_url]
-      @base_url = options[:base_url]
+  def initialize(paas_config, options = {})
+    @image_name = options[:vegeta_image_name] || DEFAULT_IMAGE_NAME
+    if paas_config[:link_container_name]
+      @link_container_name = paas_config[:link_container_name]
+    elsif paas_config[:base_url]
+      @base_url = paas_config[:base_url]
     else
       raise "Base URL or container name must be provided"
     end
@@ -28,6 +28,7 @@ class VegetaDriver
   end
 
   def run_test(endpoint, concurrency, duration)
+    puts "VEGETA: #{endpoint} #{concurrency} #{duration}"
 =begin
     container = Docker::Container.create('Image' => @image_name, 'Cmd' =>
       ["/opt/benchmark.sh container /", "container #{endpoint} #{concurrency} #{duration}s"])

@@ -89,6 +89,7 @@ describe BuildWorker do
       Build.any_instance.should_receive(:provider).and_return(:docker)
       GitCheckout.any_instance.should_receive(:retrieve).and_return(true)
       DockerBuilder.any_instance.should_receive(:build).and_return(true)
+      DockerBuilder.any_instance.should_receive(:container_name).and_return('blah')
       ProjectConfiguration.should_receive(:from_build_dir).and_return(ProjectConfiguration.new(nil))
       HttpLoadTester.any_instance.should_receive(:run).and_return(true)
       BuildResult.any_instance.should_receive(:save)

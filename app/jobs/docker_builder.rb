@@ -3,18 +3,19 @@ require 'shell'
 
 #TEST: invalid startup
 
+#TODO: Logger
 #TODO: stream output log (attach process?)
 #TODO: stream build logs
-#TODO: Curl setup (linked containers etc?)
 #TODO: Test single http run (?)
 #TODO: docker build in docker
 #TODO: Better than random port
+#TODO: Spec use shared context
+#TODO: Structs for ednpoints / configuration / all maps
 
 #TODO: Split out build & run
 #TODO: Pass in log streamer - stream as it goes
 #TODO: Exception handle on cleanup
 
-#TODO: use hash for project config
 #TODO: factory methods
 #TODO: work out of resque. remove resque status (?)
 #TODO: Reorg into modules / directories
@@ -28,7 +29,7 @@ class DockerBuilder
     @errors = []
     @container = nil
     @image = nil
-    @container_port = project_configuration.configuration[:port]
+    @container_port = project_configuration.port
     @host_port  = options[:host_port] || rand(8000..65535)
   end
 

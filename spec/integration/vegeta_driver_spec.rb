@@ -22,10 +22,21 @@ describe VegetaDriver do
       `docker ps | grep "ruby simple"`.chomp.should eq('')
     end
 
-    it 'should run benchmark' do
-      puts "CONTAINER NAME: #{@builder.container_name}"
+    #ASSUMES: Image name 'vegeta' on docker build (TODO: Add rake task to prep docker images)
+    it 'should run benchmark against linked container' do
       vegeta = VegetaDriver.new(:link_container_name => @builder.container_name)
-      vegeta.run_test('/', 1, 2).should have_key('latencies')
+      result = vegeta.run_test('/', 1, 2)
+      result.should have_key('latencies')
+      result['success'].should eq(1)
+    end
+
+    it 'should run benchmark against public endpoint' do
+      vegeta = VegetaDriver.new(:base_url => 'http://www.yahoo.com')
+      result = vegeta.run_test('/', 1, 2)
+      result.should have_key('latencies')
+      result['success'].should eq(1)
+
+      fail
     end
   end
 end

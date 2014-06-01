@@ -1,40 +1,46 @@
 #TODO: separate out into other class
+#TODO: Rename (? - orchestration_worker)
 class BuildWorker < Worker
     include Resque::Plugins::Status
     @queue = "docker"
 
     def perform
+      is_remote = !(ENV['LOCAL_WORKSPACE'] == 'true')
+      build = Build.find(options['build_id'])
+      build_and_test(build, :is_remote => is_remote)
+    end
+
+    def build_and_test(build, options = {})
       paas = nil
       project_checkout = nil
       load_tester = nil
-      is_remote = !(ENV['LOCAL_WORKSPACE'] == 'true')
+      is_remote = options[:is_remote]
 
       begin
-        build = Build.find(options['build_id'])
         build_results = BuildResult.new(build)
 
         project_checkout = project_fetcher(build, is_remote)
         unless project_checkout.retrieve
-          raise_execution_error(build_results, project_checkout.errors)
+          execution_error(build_results, project_checkout.errors)
         end
         project_src = project_checkout.source_dir
 
-        configuration = ProjectConfiguration.from_build_dir(project_src)
-        unless configuration.valid?
-          raise_execution_error(build_results, configuration.errors)
+        test_configuration = ProjectConfiguration.from_build_dir(project_src)
+        unless test_configuration.valid?
+          execution_error(build_results, test_configuration.errors)
         end
 
-        paas = paas_for_build(build, project_src, configuration)
+        paas = paas_for_build(build, project_src, test_configuration)
         unless paas.build
-          raise_execution_error(build_results, paas.errors)
+          execution_error(build_results, paas.errors)
         end
 
-        load_tester = HttpLoadTester.new(paas.base_test_url, configuration)
+        load_tester = HttpLoadTester.new(paas_configuration(paas), test_configuration)
         if load_tester.run
           build_results.test_results = load_tester.test_results
           build_results.save
         else
-          raise_execution_error(build_results, load_tester.errors)
+          execution_error(build_results, load_tester.errors)
         end
 
       ensure
@@ -44,12 +50,21 @@ class BuildWorker < Worker
       end
     end
 
-    def paas_for_build(build, project_src, configuration)
+    def paas_for_build(build, project_src, test_configuration)
       if build.provider == :docker
-        paas = DockerBuilder.new(project_src, configuration)
+        paas = DockerBuilder.new(project_src, test_configuration)
       else
         provider = build.repository.provider
-        paas = HerokuBuilder.new(project_src, provider, configuration)
+        paas = HerokuBuilder.new(project_src, provider, test_configuration)
+      end
+    end
+
+    def paas_configuration(paas)
+      # configuration to hand to load tester
+      if paas.is_a?(DockerBuilder)
+        {link_container_name: paas.container_name}
+      else
+        {base_url: paas.base_test_url}
       end
     end
 
@@ -61,7 +76,7 @@ class BuildWorker < Worker
       end
     end
 
-    def raise_execution_error(build_results, errors)
+    def execution_error(build_results, errors)
       build_results.add_errors(errors)
       build_results.save
       raise Exception.new(errors.to_s)
