@@ -10,7 +10,7 @@ class Build < ActiveRecord::Base
 
   #TODO: Fill this out
   def provider
-    :local
+    :docker
   end
 
   def self.from_payload(payload)
@@ -28,11 +28,7 @@ class Build < ActiveRecord::Base
   end
 
   def run_build
-    DockerWorker.create(
-      :url => url,
-      :repo => repository.name,
-      :build_id => id
-    )
+    BuildWorker.create(:build_id => id)
   end
 
   def mark_build_finished
@@ -51,21 +47,12 @@ class Build < ActiveRecord::Base
 
   #TODO: prob need to add build endpoints here and then update them later
   #      in case some of them don't come back
-  def add_endpoint(url, headers, options = {})
+  def add_endpoint(url, headers, attribs = {})
     # Add other options to where clause to make them unique endpoints
-    endpoint = repository.endpoints.where(url: url).first
-    max_response_time = options[:max_response_time]
-    target_response_time = options[:target_response_time]
-    if endpoint
-      if ( endpoint.max_response_time != max_response_time ||
-        endpoint.target_response_time != target_response_time )
-        endpoint.update_attributes! max_response_time: max_response_time,
-          target_response_time: target_response_time
-      end
-    end
+    endpoint = repository.endpoints.where({url: url}.merge(attribs)).first
     unless endpoint
       endpoint = Endpoint.create!({repository: repository, url: url,
-        headers: JSON.generate(headers)}.merge(options))
+        headers: JSON.generate(headers)}.merge(attribs))
     end
     endpoint
   end
@@ -125,12 +112,16 @@ class Build < ActiveRecord::Base
 
   def self.message_for_status(status)
     case (status || '').to_sym
+    when :cloning
+      "Cloning Code"
     when :pending
       "Waiting to Build"
     when :building_container
       "Building Docker Container"
     when :attacking_container
       "Benchmarking Container"
+    when :saving_results
+      "Saving Results"
     when :success
       "Success"
     when :failed

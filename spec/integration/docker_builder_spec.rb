@@ -39,8 +39,8 @@ describe DockerBuilder do
       @builder.container_name.should_not be_empty
     end
 
-    it 'should expose port 4567' do
-      `docker ps | grep "ruby simple" | grep ">4567/tcp"`.chomp.should_not eq('')
+    it 'should expose port 9080' do
+      `docker ps | grep "ruby simple" | grep ">9080/tcp"`.chomp.should_not eq('')
     end
 
     describe 'build log' do

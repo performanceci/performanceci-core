@@ -9,7 +9,7 @@ class LocalCheckout
 
   def retrieve
     @build_dir = Dir.mktmpdir
-    System("cp -R #{repo_dir} #{build_dir}")
+    `cp -R #{repo_dir} #{build_dir}`
   end
 
   def source_dir

@@ -1,236 +1,102 @@
 #TODO: separate out into other class
 #TODO: Rename (? - orchestration_worker)
 class BuildWorker < Worker
-    include Resque::Plugins::Status
-    @queue = "docker"
+  include Resque::Plugins::Status
+  @queue = "docker"
 
-    def perform
-      is_remote = !(ENV['LOCAL_WORKSPACE'] == 'true')
-      build = Build.find(options['build_id'])
-      build_and_test(build, :is_remote => is_remote)
-    end
+  def perform
+    is_remote = !(ENV['LOCAL_WORKSPACE'] == 'true')
+    build = Build.find(options['build_id'])
+    build_and_test(build, :is_remote => is_remote)
+  end
 
-    def build_and_test(build, options = {})
-      paas = nil
-      project_checkout = nil
-      load_tester = nil
-      is_remote = options[:is_remote]
+  def build_and_test(build, options = {})
+    paas = nil
+    project_checkout = nil
+    load_tester = nil
+    is_remote = options[:is_remote]
 
-      begin
-        build_results = BuildResult.new(build)
+    begin
+      update_status(build, :cloning, 1)
 
-        project_checkout = project_fetcher(build, is_remote)
-        unless project_checkout.retrieve
-          execution_error(build_results, project_checkout.errors)
-        end
-        project_src = project_checkout.source_dir
-
-        test_configuration = ProjectConfiguration.from_build_dir(project_src)
-        unless test_configuration.valid?
-          execution_error(build_results, test_configuration.errors)
-        end
-
-        paas = paas_for_build(build, project_src, test_configuration)
-        unless paas.build
-          execution_error(build_results, paas.errors)
-        end
-
-        load_tester = HttpLoadTester.new(paas_configuration(paas), test_configuration)
-        if load_tester.run
-          build_results.test_results = load_tester.test_results
-          build_results.save
-        else
-          execution_error(build_results, load_tester.errors)
-        end
-
-      ensure
-        project_checkout.cleanup rescue nil if project_checkout
-        paas.cleanup rescue nil if paas
-        load_tester.cleanup rescue nil if load_tester
+      project_checkout = project_fetcher(build, is_remote)
+      unless project_checkout.retrieve
+        execution_error(build_results, project_checkout.errors)
       end
-    end
+      project_src = project_checkout.source_dir
 
-    def paas_for_build(build, project_src, test_configuration)
-      if build.provider == :docker
-        paas = DockerBuilder.new(project_src, test_configuration)
+      test_configuration = ProjectConfiguration.from_build_dir(project_src)
+      unless test_configuration.valid?
+        execution_error(build_results, test_configuration.errors)
+      end
+
+      update_status(build, :building_container, 2)
+
+      build_results = BuildResult.new(test_configuration, build)
+      paas = paas_for_build(build, project_src, test_configuration)
+      unless paas.build
+        execution_error(build_results, paas.errors)
+      end
+
+      update_status(build, :attacking_container, 3)
+
+      load_tester = HttpLoadTester.new(paas_configuration(paas), test_configuration)
+      if load_tester.run
+        build_results.test_results = load_tester.test_results
+
+        update_status(build, :saving_results, 4)
+
+        build_results.save
       else
-        provider = build.repository.provider
-        paas = HerokuBuilder.new(project_src, provider, test_configuration)
+        execution_error(build_results, load_tester.errors)
       end
+
+    ensure
+
+      update_status(build, :cleaning_workspace, 5)
+
+      project_checkout.cleanup rescue nil if project_checkout
+      paas.cleanup rescue nil if paas
+      load_tester.cleanup rescue nil if load_tester
     end
 
-    def paas_configuration(paas)
-      # configuration to hand to load tester
-      if paas.is_a?(DockerBuilder)
-        {link_container_name: paas.container_name}
-      else
-        {base_url: paas.base_test_url}
-      end
+    build.mark_build_finished
+  end
+
+  def update_status(build, status, step, total = 6)
+    at(step, total, status.to_s)
+    build.update_status(status, step / total.to_f * 100)
+  end
+
+  def paas_for_build(build, project_src, test_configuration)
+    if build.provider == :docker
+      paas = DockerBuilder.new(project_src, test_configuration)
+    else
+      provider = build.repository.provider
+      paas = HerokuBuilder.new(project_src, provider, test_configuration)
     end
+  end
 
-    def project_fetcher(build, is_remote)
-      if is_remote
-        project_checkout = GitCheckout.new(build.repository.full_name, build.url, build.after)
-      else
-        project_checkout = LocalCheckout.new(build.repository.full_name, build.url)
-      end
+  def paas_configuration(paas)
+    # configuration to hand to load tester
+    if paas.is_a?(DockerBuilder)
+      {link_container_name: paas.container_name}
+    else
+      {base_url: paas.base_test_url}
     end
+  end
 
-    def execution_error(build_results, errors)
-      build_results.add_errors(errors)
-      build_results.save
-      raise Exception.new(errors.to_s)
+  def project_fetcher(build, is_remote)
+    if is_remote
+      project_checkout = GitCheckout.new(build.repository.full_name, build.url, build.after)
+    else
+      project_checkout = LocalCheckout.new(build.repository.full_name, build.url)
     end
+  end
 
-      # checkout project from git / gitlab / local etc
-      # allow local repo
-
-      # bring up instance of app using paas
-        # blocking / non blocking?
-        # heroku - pass env variables
-            # create app / destroy app
-            # save app info for cleanup
-            # destroy app
-            # save build logs
-        # where to save / configure variables for heroku?
-        # docker
-            # user docker builder docker image
-            # docker run etc...
-            # how to keep track of duplicate ports? (redis?)
-            # cleanup
-        # return base URL for testing
-        # or failure of app
-        # save run logs after test
-      # reaper worker
-
-      # test instance using tester
-        # bring up docker instance
-        # test against endpoints
-        # get results
-        # parse and save
-
-      # relay status info back to main server (API)
-        # either save object directly (not ideal) OR:
-        # /builds/123/endpoints POST
-        # /builds/123/build_endpoints POST
-        # /builds/123/status POST
-=begin
-      unless ENV['DOCKER_URL']
-        ENV['DOCKER_URL'] = 'unix:///var/run/docker.sock'
-      end
-      Docker.url = ENV['DOCKER_URL']
-
-      build = Build.find(options['build_id'])
-      url   = build.url
-      repo  = build.repository.full_name
-      root  = ENV['WORKSPACE'] || Dir.tmpdir
-      host  = ENV['HOST']      || 'localhost'
-      if ENV['EXPORT_PORT']
-        port = ENV['EXPORT_PORT']
-      else
-        port  = rand(8000..8999)
-      end
-
-      base      = "#{root}/#{build.id}"
-      workspace = "#{base}/#{repo}"
-
-      at(0, 9, "Cleaning up workspace")
-      build.update_status(:pending, 0)
-      FileUtils.rm_r base if Dir.exists? base
-
-
-      if ENV['LOCAL_WORKSPACE']
-        Worker.system_quietly("mkdir #{base}")
-        workspace = base + "/" + ENV['LOCAL_WORKSPACE'].split('/').last
-        Worker.system_quietly("cp -R #{ENV['LOCAL_WORKSPACE']} #{workspace}")
-        at(1, 9, "cp -R #{ENV['LOCAL_WORKSPACE']} #{workspace}")
-      else
-        at(1, 9, "Cloning Repo")
-        Git.clone(url, workspace)
-      end
-      # Check for Dockerfile and perfci.yaml
-      ['Dockerfile', '.perfci.yaml'].each do |file|
-        if !File.exists? "#{workspace}/#{file}"
-          build.mark_build_error("#{file} does not exist")
-          raise "#{file} does not exist"
-        end
-      end
-
-      # Read endpoints from perfci.yaml
-      conf = File.read("#{workspace}/.perfci.yaml")
-      yaml_hash = YAML.load(conf)
-      endpoints = (yaml_hash['endpoints'] || []).map { |endpoint| endpoint }
-      build_endpoints = endpoints.map do |endpoint|
-        build.add_endpoint(
-          endpoint['uri'],
-          {},
-          :max_response_time    => (endpoint['max_response_time']    || 0.01),
-          :target_response_time => (endpoint['target_response_time'] || 0.001)
-        )
-      end
-
-      at(2, 9, "Building container")
-      build.update_status(:building_container, 20)
-      begin
-        image = Docker::Image.build_from_dir(workspace)
-      rescue Docker::Error::DockerError => e
-        puts "Error: #{e.to_s}\n#{e.backtrace}"
-        build.mark_build_error(e.to_s + "\n" + e.backtrace.to_s)
-        raise e
-      end
-
-      at(3, 9, "Running container")
-      begin
-        container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{port}:4567 #{image.id}")
-      rescue Shell::Error => e
-        puts "Error: #{e.backtrace}"
-        build.mark_build_error(e.backtrace.to_s)
-        raise e
-      end
-      container = Docker::Container.get(container_id)
-
-      at(4, 9, "Signaling KillaBeez")
-      build.update_status(:attacking_container, 40)
-      endpoints = endpoints.map { |e| e['uri'] }
-      job_ids = 6.times.collect do
-        KillaBeez.create(:endpoints => endpoints, :host => host, :port => port)
-      end
-
-      at(5, 9, "Collecting data")
-      statuses = job_ids.map do |job_id|
-        status = Resque::Plugins::Status::Hash.get(job_id)
-        while !status.completed? && !status.failed? do
-          sleep 1
-          status = Resque::Plugins::Status::Hash.get(job_id)
-        end
-        status['latency']
-      end
-
-      at(6, 9, "Storing stats")
-      begin
-        latency = []
-        count = 0
-        build_endpoints.each do |endpoint|
-          latencies = statuses.map { |lat|  lat[count] }
-          latency[count] = latencies.reduce(:+)
-          latency[count] = latency[count] / 6
-          build.endpoint_benchmark(endpoint, latency[count], 0, [])
-          count += 1
-        end
-      rescue Exception => e
-        puts "Error: #{e.to_s}\n#{e.backtrace}"
-        container.kill
-        build.mark_build_error(e.to_s + "\n" + e.backtrace.to_s)
-        raise e
-      end
-
-      at(7, 9, "Killing container")
-      container.kill
-
-      at(8, 9, "Cleaning workspace")
-      FileUtils.rm_r base
-      build.mark_build_finished
-      puts "Performance Tested!"
-    end
-=end
+  def execution_error(build_results, errors)
+    build_results.add_errors(errors)
+    build_results.save
+    raise Exception.new(errors.to_s)
+  end
 end

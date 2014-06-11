@@ -1,10 +1,12 @@
-port: 4567
+port: 9080
 endpoints:
   -
     name: homepage
     uri: '/'
     max_response_time: 0.09
     target_response_time: 0.05
+    concurrency: 10
+    duration: 10
   -
     name: test
     uri: '/test'
