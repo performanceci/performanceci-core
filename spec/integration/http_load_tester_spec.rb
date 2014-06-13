@@ -26,6 +26,7 @@ describe HttpLoadTester do
       load_tester = HttpLoadTester.new({link_container_name: @builder.container_name}, @test_config)
       load_tester.run.should_not be_nil
       results = load_tester.test_results
+      puts results.to_json
       results.all? { |t| t['success'] == 1 }.should be_true
     end
   end

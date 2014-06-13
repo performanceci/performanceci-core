@@ -27,6 +27,7 @@ describe VegetaDriver do
       vegeta = VegetaDriver.new(:link_container_name => @builder.container_name)
       result = vegeta.run_test('/', 1, 2)
       result.should have_key('latencies')
+      puts result.to_json
       result['success'].should eq(1)
     end
 
@@ -34,6 +35,7 @@ describe VegetaDriver do
       vegeta = VegetaDriver.new(:base_url => 'http://www.yahoo.com')
       result = vegeta.run_test('/', 1, 2)
       result.should have_key('latencies')
+      puts result.to_json
       result['success'].should eq(1)
 
       fail

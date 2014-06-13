@@ -27,6 +27,7 @@ class BuildWorker < Worker
 
       test_configuration = ProjectConfiguration.from_build_dir(project_src)
       unless test_configuration.valid?
+        build_results = BuildResult.new(test_configuration, build)
         execution_error(build_results, test_configuration.errors)
       end
 
@@ -52,8 +53,6 @@ class BuildWorker < Worker
       end
 
     ensure
-
-      update_status(build, :cleaning_workspace, 5)
 
       project_checkout.cleanup rescue nil if project_checkout
       paas.cleanup rescue nil if paas

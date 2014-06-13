@@ -1,8 +1,6 @@
 require 'docker'
 require 'shell'
 
-#TEST: invalid startup
-
 #TODO: Logger
 #TODO: stream output log (attach process?)
 #TODO: stream build logs
@@ -10,15 +8,32 @@ require 'shell'
 #TODO: docker build in docker
 #TODO: Better than random port
 #TODO: Spec use shared context
-#TODO: Structs for ednpoints / configuration / all maps
-
-#TODO: Split out build & run
+#TODO: Split out build & run (build on other VM)
+#TODO: Vegeta - public endpoint
 #TODO: Pass in log streamer - stream as it goes
 #TODO: Exception handle on cleanup
 
-#TODO: factory methods
 #TODO: work out of resque. remove resque status (?)
 #TODO: Reorg into modules / directories
+
+#TODO: systemwide scheduler / throttle for builds
+#PORT - use port instead of EXPOSE?
+
+#TODO: Sanitize inputs
+
+#TODO: Save + display other information
+
+#TEST SCENARIOS:
+# dockerfile not there
+# perfci not valid
+# can't build dockerfile
+# invalid bundle
+# can't run test
+# can't access port
+# system error
+# no exposed port
+# invalid url
+
 class DockerBuilder
   attr_reader :src_dir, :image, :errors, :container,
               :host_port, :container_port, :build_logs
