@@ -1,0 +1,14 @@
+port: 9080
+endpoints:
+  -
+    name: homepage
+    uri: '/'
+    max_response_time: 0.09
+    target_response_time: 0.05
+    concurrency: 2
+    duration: 1
+  -
+    name: test
+    uri: '/test'
+    max_response_time: 0.9
+    target_response_time: 0.5

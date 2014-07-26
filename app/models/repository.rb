@@ -75,6 +75,10 @@ class Repository < ActiveRecord::Base
     builds.order("created_at DESC").first
   end
 
+  #TODO: fill out
+  def provider
+  end
+
   private
 
   def hook_url_config(user)
