@@ -53,13 +53,14 @@ luser@vagrant:~$ export GITHUB_SECRET=f9633c56f2430d5b2beb4334d996b571dbdef9f1
 
 Here is our current deployment stack
 
-### Ubuntu (13.10)
+### Ubuntu 14.04.2 LTS (Trusty Tahr)
 
-[Ubuntu](http://www.ubuntu.com/)
+[Ubuntu](http://releases.ubuntu.com/trusty/)
 
-We have included a simple [bootstrap](scripts/bootstrap.sh) script
-which should get most of dependencies out of the way. This script currently
-assumes a stack based on the latest Ubuntu (13.10).
+We have included some simple [salt states](salt/roots/) to ensure a development
+host includes the necessary dependencies. At this time, these may be considered
+a starting point for production deployments. These states currently assume
+a stack based on the latest Long Term Support Ubuntu (14.04.2).
 
 ### Ruby on Rails
 
