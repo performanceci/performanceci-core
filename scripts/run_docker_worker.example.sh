@@ -2,7 +2,8 @@
 
 set -e
 
-export HOST=localhost
+export DB_HOST='192.168.69.20'
+export REDIS_HOST='192.168.69.20'
 export RAILS_ENV=development
 export QUEUE=docker
 bundle exec rake resque:work
