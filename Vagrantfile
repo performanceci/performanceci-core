@@ -25,6 +25,12 @@ Vagrant.configure(2) do |config|
     db.vm.network "private_network", ip: "192.168.69.20"
   end
 
+  # Hoster
+  config.vm.define "docker" do |docker|
+    docker.vm.hostname = "docker"
+    docker.vm.network "private_network", ip: "192.168.69.30"
+  end
+
   # Core product
   config.vm.define "core", primary: true do |core|
     core.vm.hostname = "core"
