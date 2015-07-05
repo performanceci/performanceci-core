@@ -3,7 +3,6 @@
 
 setup = <<SCRIPT
 cd /vagrant
-bundle install
 export DB_HOST='192.168.69.20'
 bundle exec rake db:seed
 bundle exec rake db:migrate
