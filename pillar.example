@@ -1,0 +1,12 @@
+registry:
+  lookup:
+    restart: 'always'
+    amazon:
+      aws_bucket: 'my-registry'
+      aws_key: 'ABCDEFGHIJK123456789'
+      aws_secret: 'AbcD+efG-HIjK1+++23456+789'
+docker-pkg:
+  lookup:
+    version: 1.6.2
+    refresh_repo: false
+    process_signature: /usr/bin/docker
