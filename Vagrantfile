@@ -29,6 +29,9 @@ Vagrant.configure(2) do |config|
   config.vm.define "docker" do |docker|
     docker.vm.hostname = "docker"
     docker.vm.network "private_network", ip: "192.168.69.30"
+    docker.vm.provider "virtualbox" do |vbox|
+      vbox.memory = 4096
+    end
   end
 
   # Core product
