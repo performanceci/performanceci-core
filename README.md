@@ -6,6 +6,19 @@ it to the public as open source.
 
 ## Development
 
+### Salt
+
+We are providing some example salt states to help manage a development
+environment. The environment provided is a standalone/masterless setup for
+simplicity. This has lead to a convention of salt formula dependency management
+via git subtrees/remotes. While this requires a bit of extra effort from a new
+developer, we believe this overhead is acceptable.
+
+```bash
+luser@lolcathost:perfocmanceci-core $ git remote add docker-formula https://github.com/saltstack-formulas/docker-formula.git
+luser@lolcathost:perfocmanceci-core $ git subtree add --prefix salt/formulas/docker-formula docker-formula master --squash
+```
+
 ### Vagrant
 
 We should strive to provide a Vagrantfile meeting the minimum requirements to

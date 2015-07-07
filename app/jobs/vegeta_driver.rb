@@ -49,6 +49,6 @@ class VegetaDriver
   end
 
   def vegeta_args(type, endpoint, concurrency, duration)
-    "/opt/benchmark.sh #{type} #{endpoint} #{concurrency} #{duration}s"
+    "/go/bin/benchmark.sh #{type} #{endpoint} #{concurrency} #{duration}s"
   end
 end

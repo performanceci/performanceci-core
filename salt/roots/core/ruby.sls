@@ -8,3 +8,10 @@ rails package dependencies:
       - libpq-dev
       - libsqlite3-dev
       - bundler
+
+rails gem dependencies:
+  cmd.wait:
+    - name: bundle install
+    - cwd: /vagrant
+    - watch:
+      - pkg: rails package dependencies

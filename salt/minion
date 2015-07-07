@@ -1,5 +1,5 @@
 file_client: local
-
-startup_states: sls
-sls_list:
-- minion
+file_roots:
+  base:
+    - /srv/salt
+    - /srv/formulas/docker-formula

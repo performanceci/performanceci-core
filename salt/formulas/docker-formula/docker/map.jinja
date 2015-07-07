@@ -1,0 +1,60 @@
+{% set registry = salt['grains.filter_by']({
+    'default': {
+        'description': 'Docker Registry',
+        'port': '5000',
+        'restart': 'no',
+        'search_backend': 'sqlalchemy'
+    },
+}, merge=salt['pillar.get']('registry:lookup')) %}
+
+{% set amazon = salt['grains.filter_by']({
+    'default': {
+        'settings_flavor': 's3',
+        'storage_path': '/registry'
+    },
+}, merge=salt['pillar.get']('registry:lookup:amazon')) %}
+
+{% set kernel = salt['grains.filter_by'] ({
+    'wheezy': {
+        'pkg': {
+            'name': 'linux-image-amd64',
+            'fromrepo': 'wheezy-backports'
+        },
+        'pkgrepo': {
+            'name': 'deb http://http.debian.net/debian wheezy-backports main',
+            'humanname': 'Wheezy Backports',
+            'dist': 'wheezy-backports'
+        }
+    },
+    'jessie': {
+        'pkg': {
+            'name': 'linux-image-amd64',
+            'fromrepo': 'jessie-backports'
+        },
+        'pkgrepo': {
+            'name': 'deb http://http.debian.net/debian jessie-backports main',
+            'humanname': 'Jessie Backports',
+            'dist': 'jessie-backports'
+        }
+    },
+    'precise': {
+        'pkg': {
+            'pkgs': ['linux-image-generic-lts-raring', 'linux-headers-generic-lts-raring']
+        }
+    },
+},
+grain='lsb_distrib_codename',
+merge=salt['pillar.get']('registry:lookup')) %}
+
+{% set compose = salt['grains.filter_by']({
+    'default': {
+        'version': '1.1.0'
+    },
+}, merge=salt['pillar.get']('registry:lookup')) %}
+
+{% set pkg = salt['grains.filter_by']({
+    'default': {
+        'process_signature': '/usr/bin/docker',
+        'refresh_repo': True
+    },
+}, merge=salt['pillar.get']('docker-pkg:lookup'), base='default') %}
