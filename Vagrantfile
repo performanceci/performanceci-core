@@ -13,6 +13,7 @@ Vagrant.configure(2) do |config|
   # Common
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder "salt/roots/", "/srv/salt/"
+  config.vm.synced_folder "salt/pillar/", "/srv/pillar/"
   config.vm.synced_folder "salt/formulas/", "/srv/formulas/"
   config.vm.provision :salt do |salt|
     salt.minion_config = "salt/minion"

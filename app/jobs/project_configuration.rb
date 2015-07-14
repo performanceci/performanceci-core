@@ -2,8 +2,8 @@ require 'yaml'
 class ProjectConfiguration
   DEFAULT_MAX_RESP = 0.5
   DEFAULT_TARGET_RESP = 0.3
-  DEFAULT_CONCURRENCY = 1
-  DEFAULT_DURATION = 1
+  DEFAULT_CONCURRENCY = 10
+  DEFAULT_DURATION = 5
 
   attr_reader :errors, :configuration
 
