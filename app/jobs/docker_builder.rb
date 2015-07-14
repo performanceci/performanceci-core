@@ -3,7 +3,7 @@ require 'shell'
 
 class DockerBuilder
 
-  DOCKER_HOST = ENV['DOCKER_HOST'] || '127.0.0.1'
+  SERVER_HOST = ENV['SERVER_HOST'] || '127.0.0.1'
 
   attr_reader :src_dir, :image, :errors, :container,
               :host_port, :container_port, :build_logs
@@ -71,6 +71,6 @@ class DockerBuilder
 
   #TODO: return hostname for multi machine builds
   def base_test_url
-    "http://#{DOCKER_HOST}:#{host_port}"
+    "http://#{SERVER_HOST}:#{host_port}"
   end
 end
