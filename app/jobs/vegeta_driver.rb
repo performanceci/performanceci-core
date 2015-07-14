@@ -27,28 +27,15 @@ class VegetaDriver
     new(base_url: base_url)
   end
 
-  def run_test(endpoint, concurrency, duration)
-    if link_container_name
-      command = "#{docker_run_link_cmd} #{vegeta_args('container', endpoint, concurrency, duration)}"
-    else
-      command = "#{docker_run_cmd} #{vegeta_args('link', base_url + endpoint, concurrency, duration)}"
-    end
-    puts command
+  def run_test(endpoint, rate, duration)
+    command = "docker run --rm #{vegeta_args(@base_url + endpoint, duration, rate)} #{@image_name}"
     result = `#{command}`
     HashUtil.symbolize_keys(JSON.parse(result))
   end
 
   private
 
-  def docker_run_link_cmd
-    "docker run -i -a stdout -link #{@link_container_name}:test_host #{@image_name}"
-  end
-
-  def docker_run_cmd
-    "docker run -i -a stdout #{@image_name}"
-  end
-
-  def vegeta_args(type, endpoint, concurrency, duration)
-    "/go/bin/benchmark.sh #{type} #{endpoint} #{concurrency} #{duration}s"
+  def vegeta_args(endpoint, duration, rate)
+    "-e TARGET=#{endpoint} -e DURATION=#{duration}s -e RATE=#{rate}"
   end
 end
