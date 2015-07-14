@@ -62,6 +62,43 @@ luser@vagrant:~$ export GITHUB_ID=015a6232ecb598df88f8
 luser@vagrant:~$ export GITHUB_SECRET=f9633c56f2430d5b2beb4334d996b571dbdef9f1
 ```
 
+### Example Startup
+
+For now, we have provided some example startup scripts under the `scripts`
+directory of the project. The only thing you should need to do is copy these
+to some name of your own choosing, and update the three environment variables
+described above.
+
+```shell
+WEBHOOL_URL
+GITHUB_ID
+GITHUB_SECRET
+```
+
+These three environment variables must be set for you to test or demo the
+service locally. They must be set according to your own setup as described
+above.
+
+The minimum needed to get up from here, is to start the rails server and at
+least one "docker" worker.
+
+```shell
+luser@lolcathost:performanceci-core$ vagrant ssh docker
+luser@vagrant:~$ cd /vagrant/scripts
+luser@vagrant:/vagrant/scripts$ ./run_docker_worker.sh
+^D
+luser@lolcathost:performanceci-core$ vagrant ssh core
+luser@vagrant:~$ cd /vagrant/scripts
+luser@vagrant:/vagrant/scripts$ ./run.sh
+^D
+```
+
+Then just point your browser of choice at the ngrok URL you configured above.
+You may log into the service with your GitHub account.
+
+You will find log output in the VMs at `~/.docker.out` and `~/.core.out`
+respectively.
+
 ## Deployment
 
 Here is our current deployment stack
