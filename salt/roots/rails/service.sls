@@ -1,6 +1,6 @@
 rails server:
   cmd.run:
-    - name: 'nohup bundle exec rails server 2>&1 < /dev/null >> /vagrant/log/rails_server.log'
+    - name: 'nohup bundle exec rails server > /vagrant/log/rails.log 2> /vagrant/log/rails.err < /dev/null &'
     - cwd: /vagrant
     - unless: pgrep -fa rails
     - env:
