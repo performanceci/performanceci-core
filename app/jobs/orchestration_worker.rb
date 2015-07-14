@@ -77,7 +77,7 @@ class OrchestrationWorker < Worker
   def paas_configuration(paas)
     # configuration to hand to load tester
     if paas.is_a?(DockerBuilder)
-      {link_container_name: paas.container_name}
+      {base_url: paas.base_test_url}
     else
       {base_url: paas.base_test_url}
     end
