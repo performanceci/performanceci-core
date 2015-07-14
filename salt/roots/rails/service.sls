@@ -6,7 +6,8 @@ rails server:
     - env:
       - DB_HOST: 192.168.69.20
       - REDIS_HOST: 192.168.69.20
-      - SERVER_HOST: 192.168.69.20
+      - SERVER_HOST: 192.168.69.30
+      - RAILS_ENV: development
       - GITHUB_ID: {{salt['pillar.get']('rails:github:id', '')}}
       - GITHUB_SECRET: {{salt['pillar.get']('rails:github:secret', '')}}
       - WEBHOOK_URL: {{salt['pillar.get']('rails:webhook:url', '')}}
