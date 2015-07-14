@@ -11,3 +11,4 @@ base:
   'core':
     - rails
     - rails.db
+    - rails.service
