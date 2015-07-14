@@ -7,7 +7,7 @@ base:
   'docker':
     - rails
     - docker
-    - core.docker
+    - worker.docker
   'core':
     - rails
     - rails.db
