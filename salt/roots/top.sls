@@ -10,3 +10,4 @@ base:
     - core.docker
   'core':
     - rails
+    - rails.db
