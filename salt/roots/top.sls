@@ -8,6 +8,7 @@ base:
     - rails
     - docker
     - worker.docker
+    - worker.service
   'core':
     - rails
     - rails.db
