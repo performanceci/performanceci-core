@@ -7,11 +7,12 @@ class HttpLoadTester
   end
 
   def run
-    @results = @test_config.endpoints.each do |endpoint|
+    @results = @test_config.endpoints.map do |endpoint|
       endpoint[:results] = @driver.run_test(endpoint[:uri], endpoint[:concurrency], endpoint[:duration])
       puts "RESULTS: #{endpoint[:results]}"
+      endpoint
     end
-    @results
+    true
   end
 
   def errors
