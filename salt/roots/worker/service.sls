@@ -7,5 +7,6 @@ resque worker service:
       - DB_HOST: 192.168.69.20
       - REDIS_HOST: 192.168.69.20
       - SERVER_HOST: 192.168.69.30
+      - DOCKER_URL: 'unix:///run/docker.sock'
       - RAILS_ENV: development
       - QUEUE: docker
