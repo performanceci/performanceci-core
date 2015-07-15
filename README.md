@@ -21,10 +21,10 @@ luser@lolcathost:perfocmanceci-core $ git subtree add --prefix salt/formulas/doc
 
 ### Vagrant
 
-We have attempred to provide a Vagrantfile meeting the minimum requirements to
+We have attempted to provide a Vagrantfile meeting the minimum requirements to
 run the application[s] for demonstration and development purposes. After a
 developer has forked and/or cloned this repository from GitHub, she should be
-able to `vagrant up` and have nearly everything needed to beging testing
+able to `vagrant up` and have nearly everything needed to begin testing
 and working.
 
 ### ngrok
