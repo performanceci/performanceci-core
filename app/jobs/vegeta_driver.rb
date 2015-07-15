@@ -29,6 +29,7 @@ class VegetaDriver
 
   def run_test(endpoint, rate, duration)
     command = "docker run --rm #{vegeta_args(@base_url + endpoint, duration, rate)} #{@image_name}"
+    puts "RUNNING: #{command}"
     result = `#{command}`
     HashUtil.symbolize_keys(JSON.parse(result))
   end

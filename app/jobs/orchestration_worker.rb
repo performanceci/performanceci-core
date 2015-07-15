@@ -48,14 +48,14 @@ class OrchestrationWorker < Worker
       else
         execution_error(build_results, load_tester.errors)
       end
-
+    rescue Exception => e
+      execution_error(build_results, [e.to_s])
     ensure
 
       project_checkout.cleanup rescue nil if project_checkout
       paas.cleanup rescue nil if paas
       load_tester.cleanup rescue nil if load_tester
     end
-
     build.mark_build_finished
   end
 
