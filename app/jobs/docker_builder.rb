@@ -4,6 +4,7 @@ require 'shell'
 class DockerBuilder
 
   SERVER_HOST = ENV['SERVER_HOST'] || '127.0.0.1'
+  DEFAULT_READ_TIMEOUT = 600
 
   attr_reader :src_dir, :image, :errors, :container,
               :host_port, :container_port, :build_logs
@@ -15,11 +16,12 @@ class DockerBuilder
     @image = nil
     @container_port = project_configuration.port
     @host_port  = options[:host_port] || rand(8000..65535)
+    Docker.options[:read_timeout] = ENV['DOCKER_READ_TIMEOUT'] || DEFAULT_READ_TIMEOUT
   end
 
   def cleanup
-    container.kill if container
-    image.remove if image
+    container.kill(force: true) if container
+    image.remove(force: true) if image
   rescue Exception => e
     puts "Error: #{e.to_s} #{e.backtrace}"
   end
@@ -44,14 +46,10 @@ class DockerBuilder
 
   def build_image
     begin
-      @build_logs = `cd #{src_dir} && docker build . 2>&1`
-      if $?.success? && @build_logs =~ /Successfully built ([\S]+)/
-        @image = Docker::Image.get($1)
-        true
-      else
-        errors << "Failed to build:\n#{@build_logs}"
-        false
-      end
+      puts "DockerBuilder: Building container [#{src_dir}]"
+      @image = Docker::Image.build_from_dir(src_dir)
+      #TODO: Capture errors
+      true
     rescue Exception => e
       puts "Error: #{e.to_s}\n#{e.backtrace}"
       errors << e.to_s + "\n" + e.backtrace.to_s
@@ -60,6 +58,8 @@ class DockerBuilder
   end
 
   def run_container
+    puts "docker run -d -p 0.0.0.0:#{host_port}:#{container_port} #{image.id}"
+    #TODO: Use Docker gem for this
     container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{host_port}:#{container_port} #{image.id}")
     @container = Docker::Container.get(container_id)
     true
