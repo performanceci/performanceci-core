@@ -5,8 +5,11 @@ base:
     - core.db
     - core.redis
   'docker':
-    - core.ruby
+    - rails
     - docker
-    - core.docker
+    - worker.docker
+    - worker.service
   'core':
-    - core.ruby
+    - rails
+    - rails.db
+    - rails.service

@@ -1,13 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-setup = <<SCRIPT
-cd /vagrant
-export DB_HOST='192.168.69.20'
-bundle exec rake db:seed
-bundle exec rake db:migrate
-SCRIPT
-
 Vagrant.configure(2) do |config|
 
   # Common
@@ -39,9 +32,5 @@ Vagrant.configure(2) do |config|
   config.vm.define "core", primary: true do |core|
     core.vm.hostname = "core"
     core.vm.network "private_network", ip: "192.168.69.10"
-    core.vm.provision :shell do |shell|
-      shell.privileged = false
-      shell.inline     = setup
-    end
   end
 end

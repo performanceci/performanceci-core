@@ -21,17 +21,11 @@ luser@lolcathost:perfocmanceci-core $ git subtree add --prefix salt/formulas/doc
 
 ### Vagrant
 
-We should strive to provide a Vagrantfile meeting the minimum requirements to
+We have attempted to provide a Vagrantfile meeting the minimum requirements to
 run the application[s] for demonstration and development purposes. After a
 developer has forked and/or cloned this repository from GitHub, she should be
-able to `vagrant up` and have nearly everything needed to beging testing
+able to `vagrant up` and have nearly everything needed to begin testing
 and working.
-
-We should strive to provide documentation on the remaining steps until they are
-sufficiently automated.
-
-We have provided some example application runner scripts which should be clear
-given the provided documentation.
 
 ### ngrok
 
@@ -45,29 +39,18 @@ and the default Rails WEBrick server port.
 luser@lolcathost:~$ ~/Downloads/ngrok http 192.168.69.10:3000
 ```
 
-Use the URL provided to set the environment variable for webhooks
-
-```bash
-luser@vagrant:~$ export WEBHOOK_URL=http://37674d.ngrok.com
-```
-
 ### GitHub OAuth
 
 You will need to [Register a new OAuth application](https://github.com/settings/applications/new)
-to generate a new Client ID and Client Secret. For convenience, you may use
-these to set environment variables for your deployment to pick up.
+to generate a new Client ID and Client Secret. You will use these to set pillar
+data for your deployment.
 
-```bash
-luser@vagrant:~$ export GITHUB_ID=015a6232ecb598df88f8
-luser@vagrant:~$ export GITHUB_SECRET=f9633c56f2430d5b2beb4334d996b571dbdef9f1
-```
+### Salt
 
-### Example Startup
-
-For now, we have provided some example startup scripts under the `scripts`
-directory of the project. The only thing you should need to do is copy these
-to some name of your own choosing, and update the three environment variables
-described above.
+We will use pillar data as the simplest source for setting the necessary
+environment variables to get your application up and running. For reference,
+the following environment variable will need to be set for you to successfully
+test the full suite.
 
 ```shell
 WEBHOOL_URL
@@ -75,29 +58,25 @@ GITHUB_ID
 GITHUB_SECRET
 ```
 
-These three environment variables must be set for you to test or demo the
-service locally. They must be set according to your own setup as described
-above.
+We will expose these as pillar data in `salt/pillar/rails.sls` which you will
+find in this repository. The example we provide should look like this:
 
-The minimum needed to get up from here, is to start the rails server and at
-least one "docker" worker.
-
-```shell
-luser@lolcathost:performanceci-core$ vagrant ssh docker
-luser@vagrant:~$ cd /vagrant/scripts
-luser@vagrant:/vagrant/scripts$ ./run_docker_worker.sh
-^D
-luser@lolcathost:performanceci-core$ vagrant ssh core
-luser@vagrant:~$ cd /vagrant/scripts
-luser@vagrant:/vagrant/scripts$ ./run.sh
-^D
+```yaml
+rails:
+  github:
+    id: e25ce854ac3bd4d21641
+    secret: aec6e45fbed7a749203ebb52b33aaa08bf7c9073
+  webhook:
+    url: https://a3010de7.ngrok.io
 ```
+
+Update those values with the ones as described above, `vagrant up`, and go get
+some coffee or tea.
 
 Then just point your browser of choice at the ngrok URL you configured above.
 You may log into the service with your GitHub account.
 
-You will find log output in the VMs at `~/.docker.out` and `~/.core.out`
-respectively.
+You will find log output in under the  `logs` directory.
 
 ## Deployment
 
