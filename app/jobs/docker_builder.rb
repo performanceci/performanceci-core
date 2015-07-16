@@ -20,7 +20,8 @@ class DockerBuilder
   end
 
   def cleanup
-    container.kill(force: true) if container
+    container.stop(force: true) if container
+    container.delete(force: true) if container
     image.remove(force: true) if image
   rescue Exception => e
     puts "Error: #{e.to_s} #{e.backtrace}"
