@@ -32,5 +32,6 @@ Vagrant.configure(2) do |config|
   config.vm.define "core", primary: true do |core|
     core.vm.hostname = "core"
     core.vm.network "private_network", ip: "192.168.69.10"
+    core.vm.network "forwarded_port", ip: "127.0.0.1", guest: 3000, host: 3000, protocol: 'tcp'
   end
 end
