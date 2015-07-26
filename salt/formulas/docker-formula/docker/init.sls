@@ -1,83 +1,92 @@
-{% from "docker/map.jinja" import kernel with context %}
-{% from "docker/map.jinja" import pkg with context %}
-
-docker-python-apt:
-  pkg.installed:
-    - name: python-apt
-
-{% if kernel.pkgrepo is defined %}
-{{ grains['lsb_distrib_codename'] }}-backports-repo:
-  pkgrepo.managed:
-    {% for key, value in kernel.pkgrepo.items() %}
-    - {{ key }}: {{ value }}
-    {% endfor %}
-    - require:
-      - pkg: python-apt
-    - onlyif: dpkg --compare-versions {{ grains['kernelrelease'] }} lt 3.8
+{% from "docker/map.jinja" import docker with context %}
+{% if docker.kernel is defined %}
+include:
+  - .kernel
 {% endif %}
 
-{% if kernel.pkg is defined %}
-docker-dependencies-kernel:
-  pkg.installed:
-    {% for key, value in kernel.pkg.items() %}
-    - {{ key }}: {{ value }}
-    {% endfor %}
-    - require_in:
-      - pkg: lxc-docker
-    - onlyif: dpkg --compare-versions {{ grains['kernelrelease'] }} lt 3.8
-{% endif %}
-
-docker-dependencies:
+docker package dependencies:
   pkg.installed:
     - pkgs:
       - apt-transport-https
       - iptables
       - ca-certificates
       - lxc
+      - python-apt
 
-docker-repo:
+{%- if "version" in docker and docker.version < '1.7.1' %}
+docker package repository:
   pkgrepo.managed:
-    - humanname: Docker repo
     - name: deb https://get.docker.com/ubuntu docker main
-    - file: /etc/apt/sources.list.d/docker.list
+    - humanname: Old Docker Package Repository
     - keyid: d8576a8ba88d21e9
+{%- else %}
+purge old packages:
+  pkgrepo.absent:
+    - name: deb https://get.docker.com/ubuntu docker main
+  pkg.purged:
+    - name: lxc-docker*
+    - require_in:
+      - pkgrepo: docker package repository
+
+docker package repository:
+  pkgrepo.managed:
+    - name: deb https://apt.dockerproject.org/repo {{ grains["os"]|lower }}-{{ grains["oscodename"] }} main
+    - humanname: {{ grains["os"] }} {{ grains["oscodename"]|capitalize }} Docker Package Repository
+    - keyid: f76221572c52609d
+{%- endif %}
     - keyserver: keyserver.ubuntu.com
+    - file: /etc/apt/sources.list.d/docker.list
     - refresh_db: True
     - require_in:
-        - pkg: lxc-docker
+      - pkg: docker package
     - require:
-      - pkg: docker-python-apt
+      - pkg: docker package dependencies
 
-lxc-docker:
-  {% if pkg and 'version' in pkg %}
+docker package:
+  {%- if "version" in docker %}
   pkg.installed:
-    - name: lxc-docker-{{ pkg.version }}
-  {% else %}
+    {%- if  docker.version < '1.7.1' %}
+    - name: lxc-docker-{{ docker.version }}
+    {%- else %}
+    - name: docker-engine
+    - version: {{ docker.version }}
+    {%- endif %}
+  {%- else %}
   pkg.latest:
-  {% endif %}
-    - refresh: {{ pkg.refresh_repo }}
-    - fromrepo: docker
+    - name: docker-engine
+  {%- endif %}
+    - refresh: {{ docker.refresh_repo }}
     - require:
-      - pkg: docker-dependencies
+      - pkg: docker package dependencies
+      - pkgrepo: docker package repository
+
+docker-config:
+  file.managed:
+    - name: /etc/default/docker
+    - source: salt://docker/files/config
+    - template: jinja
+    - mode: 644
+    - user: root
 
 docker-service:
   service.running:
     - name: docker
     - enable: True
-    {% if pkg and "process_signature" in pkg %}
-    - sig: {{ pkg.process_signature }}
+    - watch:
+      - file: /etc/default/docker
+    {% if "process_signature" in docker %}
+    - sig: {{ docker.process_signature }}
     {% endif %}
 
-docker-py package dependency:
+docker-py requirements:
   pkg.installed:
     - name: python-pip
-
-docker-py:
   pip.installed:
-    {% if pkg and "pip_version" in pkg %}
-    - name: docker-py {{ pkg.pip_version }}
-    {% endif %}
+    {%- if "pip_version" in docker %}
+    - name: docker-py {{ docker.pip_version }}
+    {%- else %}
+    - name: docker-py
+    {%- endif %}
     - require:
-      - pkg: lxc-docker
-      - pkg: python-pip
+      - pkg: docker package
     - reload_modules: True
