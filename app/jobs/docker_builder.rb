@@ -46,36 +46,20 @@ class DockerBuilder
   end
 
   def build_image
-    begin
-      puts "DockerBuilder: Building Target Image from [#{src_dir}]"
-      @image = Docker::Image.build_from_dir(src_dir)
-      #TODO: Capture errors
-      true
-    rescue Exception => e
-      puts "Error: #{e.to_s}\n#{e.backtrace}"
-      errors << e.to_s + "\n" + e.backtrace.to_s
-      false
-    end
+    puts "DockerBuilder: Building Target Image from [#{src_dir}]"
+    @image = Docker::Image.build_from_dir(src_dir)
   end
 
   def run_container
-    begin
-      puts "DockerBuilder: Creating Target Container from [#{image.id}]"
-      @container = Docker::Container.create(
-        "PortBindings" => {
-          "#{container_port}/tcp" => [ "HostPort" => "#{host_port}" ]
-        },
-        "Image" => "#{image.id}"
-      )
-      puts "DockerBuilder: Starting Target Container [#{container.id}]"
-      container.start
-      #TODO: Capture errors
-      true
-    rescue Exception => e
-      puts "Error: #{e.to_s}\n#{e.backtrace}"
-      errors << e.to_s + "\n" + e.backtrace.to_s
-      false
-    end
+    puts "DockerBuilder: Creating Target Container from [#{image.id}]"
+    @container = Docker::Container.create(
+      "PortBindings" => {
+        "#{container_port}/tcp" => [ "HostPort" => "#{host_port}" ]
+      },
+      "Image" => "#{image.id}"
+    )
+    puts "DockerBuilder: Starting Target Container [#{container.id}]"
+    container.start
   end
 
   #TODO: return hostname for multi machine builds

@@ -31,32 +31,18 @@ class VegetaDriver
   end
 
   def pull_image
-    begin
-      puts "VegetaDriver: Pulling Benchmark Image from [#{@image_name}]"
-      @image = Docker::Image.create("fromImage" => "#{@image_name}")
-      #TODO: Capture errors
-      true
-    rescue Exception => e
-      puts "Error: #{e.to_s}\n#{e.backtrace}"
-      false
-    end
+    puts "VegetaDriver: Pulling Benchmark Image from [#{@image_name}]"
+    @image = Docker::Image.create("fromImage" => "#{@image_name}")
   end
 
   def create_container(target, duration, rate)
-    begin
-      puts "VegetaDriver: Creating Benchmark Container from [#{image.id}]"
-      @container = Docker::Container.create(
-        "Env"   => [ "TARGET=#{target}",
-                     "DURATION=#{duration}s",
-                     "RATE=#{rate}" ],
-        "Image" => "#{image.id}"
-      )
-      #TODO: Capture errors
-      true
-    rescue Exception => e
-      puts "Error: #{e.to_s}\n#{e.backtrace}"
-      false
-    end
+    puts "VegetaDriver: Creating Benchmark Container from [#{image.id}]"
+    @container = Docker::Container.create(
+      "Env"   => [ "TARGET=#{target}",
+                   "DURATION=#{duration}s",
+                   "RATE=#{rate}" ],
+      "Image" => "#{image.id}"
+    )
   end
 
   def run_test(endpoint, rate, duration)
@@ -74,9 +60,6 @@ class VegetaDriver
   def cleanup
     container.stop(force: true) if container
     container.delete(force: true) if container
-    image.remove(force: true) if image
-  rescue Exception => e
-    puts "Error: #{e.to_s} #{e.backtrace}"
   end
 
 end
