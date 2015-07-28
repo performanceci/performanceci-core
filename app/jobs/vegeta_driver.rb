@@ -65,7 +65,7 @@ class VegetaDriver
     puts "VegetaDriver: Starting Benchmark Container [#{container.id}]"
     container.start
     container.wait
-    HashUtil.symbolize_keys(JSON.parse("#{container.logs(stdout: true)}"))
+    HashUtil.symbolize_keys(JSON.parse(container.logs(stdout: true)[8..-1]))
     cleanup
   end
 
