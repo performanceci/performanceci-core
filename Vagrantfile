@@ -9,6 +9,7 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder "salt/pillar/", "/srv/pillar/"
   config.vm.synced_folder "salt/formulas/", "/srv/formulas/"
   config.vm.provision :salt do |salt|
+    salt.bootstrap_options = "-P"
     salt.minion_config = "salt/minion"
     salt.run_highstate = true
   end
