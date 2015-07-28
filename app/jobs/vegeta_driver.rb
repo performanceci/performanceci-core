@@ -3,7 +3,7 @@ require 'docker'
 class VegetaDriver
 
   HOST_ENV_VAR = 'TEST_HOST_PORT'
-  DEFAULT_IMAGE_NAME = 'perfci/vegeta'
+  DEFAULT_IMAGE_NAME = 'perfci/vegeta:0.1.0'
   VEGETA = "vegeta"
 
   attr_accessor :link_container_name, :base_url, :container,
