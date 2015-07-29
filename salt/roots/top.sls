@@ -2,7 +2,7 @@ base:
   '*':
     - core
   'db':
-    - core.db
+    - postgres
     - core.redis
   'docker':
     - rails
