@@ -46,28 +46,20 @@ class DockerBuilder
   end
 
   def build_image
-    begin
-      puts "DockerBuilder: Building container [#{src_dir}]"
-      @image = Docker::Image.build_from_dir(src_dir)
-      #TODO: Capture errors
-      true
-    rescue Exception => e
-      puts "Error: #{e.to_s}\n#{e.backtrace}"
-      errors << e.to_s + "\n" + e.backtrace.to_s
-      false
-    end
+    puts "DockerBuilder: Building Target Image from [#{src_dir}]"
+    @image = Docker::Image.build_from_dir(src_dir)
   end
 
   def run_container
-    puts "docker run -d -p 0.0.0.0:#{host_port}:#{container_port} #{image.id}"
-    #TODO: Use Docker gem for this
-    container_id = Worker.system_quietly("docker run -d -p 0.0.0.0:#{host_port}:#{container_port} #{image.id}")
-    @container = Docker::Container.get(container_id)
-    true
-  rescue Shell::Error => e
-    puts "Error: #{e.backtrace}"
-    errors << e.to_s + "\n" + e.backtrace.to_s
-    false
+    puts "DockerBuilder: Creating Target Container from [#{image.id}]"
+    @container = Docker::Container.create(
+      "PortBindings" => {
+        "#{container_port}/tcp" => [ "HostPort" => "#{host_port}" ]
+      },
+      "Image" => "#{image.id}"
+    )
+    puts "DockerBuilder: Starting Target Container [#{container.id}]"
+    container.start
   end
 
   #TODO: return hostname for multi machine builds

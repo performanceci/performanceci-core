@@ -3,10 +3,11 @@ require 'docker'
 class VegetaDriver
 
   HOST_ENV_VAR = 'TEST_HOST_PORT'
-  DEFAULT_IMAGE_NAME = 'perfci/vegeta'
+  DEFAULT_IMAGE_NAME = 'perfci/vegeta:0.1.0'
   VEGETA = "vegeta"
 
-  attr_accessor :link_container_name, :base_url
+  attr_accessor :link_container_name, :base_url, :container,
+                :image
 
   def initialize(paas_config, options = {})
     @image_name = options[:vegeta_image_name] || DEFAULT_IMAGE_NAME
@@ -17,6 +18,8 @@ class VegetaDriver
     else
       raise "Base URL or container name must be provided"
     end
+    @container = nil
+    @image = nil
   end
 
   def self.new_with_container_link(container_name)
@@ -27,16 +30,36 @@ class VegetaDriver
     new(base_url: base_url)
   end
 
+  def pull_image
+    puts "VegetaDriver: Pulling Benchmark Image from [#{@image_name}]"
+    @image = Docker::Image.create("fromImage" => "#{@image_name}")
+  end
+
+  def create_container(target, duration, rate)
+    puts "VegetaDriver: Creating Benchmark Container from [#{image.id}]"
+    @container = Docker::Container.create(
+      "Env"   => [ "TARGET=#{target}",
+                   "DURATION=#{duration}s",
+                   "RATE=#{rate}" ],
+      "Image" => "#{image.id}"
+    )
+  end
+
   def run_test(endpoint, rate, duration)
-    command = "docker run --rm #{vegeta_args(@base_url + endpoint, duration, rate)} #{@image_name}"
-    puts "RUNNING: #{command}"
-    result = `#{command}`
-    HashUtil.symbolize_keys(JSON.parse(result))
+    pull_image unless image
+    create_container(@base_url + endpoint, duration, rate)
+    puts "VegetaDriver: Starting Benchmark Container [#{container.id}]"
+    container.start
+    container.wait
+    HashUtil.symbolize_keys(JSON.parse(container.logs(stdout: true)[8..-1]))
+    cleanup
   end
 
   private
 
-  def vegeta_args(endpoint, duration, rate)
-    "-e TARGET=#{endpoint} -e DURATION=#{duration}s -e RATE=#{rate}"
+  def cleanup
+    container.stop(force: true) if container
+    container.delete(force: true) if container
   end
+
 end
