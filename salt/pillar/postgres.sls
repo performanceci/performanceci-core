@@ -9,4 +9,4 @@ postgres:
   acls:
     - ['host', 'perfci_development', 'perfci', '192.168.69.0/24', 'trust']
   postgresconf: |
-    listen_addresses = 'localhost,*'
+    listen_addresses = '0.0.0.0'
