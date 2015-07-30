@@ -51,8 +51,11 @@ class VegetaDriver
     puts "VegetaDriver: Starting Benchmark Container [#{container.id}]"
     container.start
     container.wait
-    HashUtil.symbolize_keys(JSON.parse(container.logs(stdout: true)[8..-1]))
+    logs = container.attach(:stream => false, :logs => true, :tty => false)
+    cout = logs[0]
+    cerr = logs[1]
     cleanup
+    HashUtil.symbolize_keys(JSON.parse(cout[0]))
   end
 
   private
