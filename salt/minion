@@ -4,3 +4,4 @@ file_roots:
     - /srv/salt
     - /srv/formulas/docker-formula
     - /srv/formulas/postgres-formula
+    - /srv/formulas/redis-formula
