@@ -1,3 +1,3 @@
 redis:
-  bind: 192.168.69.20
+  bind: {{ grains['ip4_interfaces']['eth1'][0] }}
   tcp_backlog: 0
