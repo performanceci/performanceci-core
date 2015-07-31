@@ -1,7 +1,7 @@
 base:
   'db':
     - postgres
-    - redis.server
+    - redis
   'docker':
     - docker
   'core':
