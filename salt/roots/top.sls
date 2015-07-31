@@ -3,7 +3,7 @@ base:
     - core
   'db':
     - postgres
-    - core.redis
+    - redis.server
   'docker':
     - rails
     - docker
