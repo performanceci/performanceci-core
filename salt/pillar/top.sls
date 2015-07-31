@@ -1,4 +1,6 @@
 base:
+  '*':
+    - core
   'db':
     - postgres
     - redis
