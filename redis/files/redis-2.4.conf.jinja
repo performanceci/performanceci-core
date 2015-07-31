@@ -1,0 +1,120 @@
+# Redis configuration file 
+{% from "redis/map.jinja" import redis_settings with context %}
+daemonize yes
+
+pidfile {{ redis_settings.pidfile }}
+port {{ redis_settings.port }}
+
+bind {{ redis_settings.bind }}
+
+{% if redis_settings.unixsocket is defined %}
+unixsocket {{ redis_settings.unixsocket }}
+unixsocketperm {{ redis_settings.unixsocketperm }}
+{% endif -%}
+
+timeout 0
+
+loglevel {{ redis_settings.loglevel }}
+
+{% if redis_settings.syslog is defined %}
+syslog-enabled yes
+syslog-ident {{ redis_settings.syslog.ident }}
+syslog-facility {{ redis_settings.syslog.facility }}
+{% if redis_settings.syslog.nologfile is defined %}
+logfile ""
+{% else %}
+logfile {{ redis_settings.logfile }}
+{% endif -%}
+{% else %}
+logfile {{ redis_settings.logfile }}
+{% endif -%}
+
+databases {{ redis_settings.database_count }}
+
+{% for s in redis_settings.snapshots -%}
+save {{ s }}
+{% endfor %}
+
+rdbcompression {{ redis_settings.rdbcompression }}
+
+dbfilename {{ redis_settings.dbfilename }}
+dir {{ redis_settings.root_dir }}
+
+{% if redis_settings.slaveof is defined %}
+slaveof {{ redis_settings.slaveof.masterip }} {{ redis_settings.slaveof.masterport }}
+{% endif -%}
+
+{% if redis_settings.masterauth is defined %}
+masterauth {{ redis_settings.masterauth }}
+{% endif -%}
+
+slave-serve-stale-data {{ redis_settings.slave_serve_stale_data }}
+
+{% if redis_settings.repl_ping_slave_period is defined %}
+repl-ping-slave-period {{ redis_settings.repl_ping_slave_period }}
+{% endif -%}
+
+{% if redis_settings.repl_timeout is defined %}
+repl-timeout {{ redis_settings.repl_timeout }}
+{% endif -%}
+
+{% if redis_settings.pass is defined %}
+requirepass {{ redis_settings.pass }}
+{% endif -%}
+
+{% if redis_settings.rename_command is defined %}
+{% for k, v in redis_settings.rename_command %}
+rename-command {{ k }} {{ v }}
+{% endfor %}
+{% endif -%}
+
+{% if redis_settings.maxclients is defined %}
+maxclients {{ redis_settings.maxclients }}
+{% endif -%}
+
+{% if redis_settings.maxmemory is defined -%}
+maxmemory {{ redis_settings.maxmemory }}
+maxmemory-policy {{ redis_settings.maxmemory_policy }}
+maxmemory-samples {{ redis_settings.maxmemory_samples }}
+{% endif %}
+
+appendonly {{ redis_settings.appendonly }}
+appendfilename {{ redis_settings.appendfilename }}
+appendfsync {{ redis_settings.appendfsync }}
+
+no-appendfsync-on-rewrite {{ redis_settings.no_appendfsync_on_rewrite }}
+auto-aof-rewrite-percentage {{ redis_settings.auto_aof_rewrite_percentage }}
+
+auto-aof-rewrite-min-size {{ redis_settings.auto_aof_rewrite_min_size }}
+
+slowlog-log-slower-than {{ redis_settings.slowlog_log_slower_than }}
+slowlog-max-len {{ redis_settings.slowlog_max_len }}
+
+################################ VIRTUAL MEMORY ###############################
+
+### WARNING! Virtual Memory is deprecated in Redis 2.4
+### The use of Virtual Memory is strongly discouraged.
+vm-enabled no
+vm-swap-file /tmp/redis.swap
+
+vm-max-memory 0
+
+vm-page-size 32
+vm-pages 134217728
+
+vm-max-threads 4
+
+############################### ADVANCED CONFIG ###############################
+
+hash-max-zipmap-entries 512
+hash-max-zipmap-value 64
+
+list-max-ziplist-entries 512
+list-max-ziplist-value 64
+
+set-max-intset-entries 512
+
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+
+activerehashing yes
