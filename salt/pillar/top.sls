@@ -1,4 +1,6 @@
 base:
+  'db':
+    - postgres
   'docker':
     - docker
   'core':
