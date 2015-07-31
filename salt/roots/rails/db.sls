@@ -1,8 +1,8 @@
 rails db migrate:
   cmd.wait:
     - name: bundle exec rake db:migrate
-    - cwd: /vagrant
+    - cwd: {{salt['pillar.get']('perfci:work_dir', '/vagrant')}}
     - env:
-      - DB_HOST: 192.168.69.20
+      - DB_HOST: {{salt['pillar.get']('perfci:db_host', 'localhost')}}
     - watch:
       - cmd: bundle install

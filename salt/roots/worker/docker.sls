@@ -1,3 +1,4 @@
+{%- if salt['pillar.get']('virtual' '') == 'VirtualBox' %}
 allow vagrant user to docker:
   group.present:
     - name: docker
@@ -5,3 +6,4 @@ allow vagrant user to docker:
       - vagrant
     - watch_in:
       - service: docker-service
+{% endif %}
