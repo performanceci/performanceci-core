@@ -1,10 +1,8 @@
 base:
   '*':
-    - core
+    - perfci
   'db':
     - postgres
     - redis
   'docker':
     - docker
-  'core':
-    - rails

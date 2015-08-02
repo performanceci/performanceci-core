@@ -1,0 +1,4 @@
+{# vi: set ft=jinja : #}
+
+{% import_yaml "perfci/defaults.yaml" as defaults %}
+{% set perfci = salt['pillar.get']('perfci', default=defaults['perfci'], merge=True) %}

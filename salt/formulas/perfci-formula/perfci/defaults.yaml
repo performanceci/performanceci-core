@@ -1,0 +1,9 @@
+perfci:
+  work_dir: '/vagrant'
+  env:
+    DB_HOST: 'localhost'
+    REDIS_HOST: 'localhost'
+    SERVER_HOST: 'localhost'
+    RAILS_ENV: 'development'
+    DOCKER_URL: 'unix:///run/docker.sock'
+    QUEUE: 'docker'

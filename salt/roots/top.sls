@@ -1,15 +1,10 @@
 base:
-  '*':
-    - core
   'db':
     - postgres
     - redis.server
   'docker':
-    - rails
+    - perfci.core
     - docker
-    - worker.docker
-    - worker.service
+    - perfci.worker
   'core':
-    - rails
-    - rails.db
-    - rails.service
+    - perfci.rails

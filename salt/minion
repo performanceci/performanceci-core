@@ -5,3 +5,4 @@ file_roots:
     - /srv/formulas/docker-formula
     - /srv/formulas/postgres-formula
     - /srv/formulas/redis-formula
+    - /srv/formulas/perfci-formula

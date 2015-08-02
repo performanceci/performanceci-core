@@ -1,3 +1,7 @@
+{% from "perfci/map.jinja" import perfci with context %}
+include:
+  - .init
+
 rails package dependencies:
   pkg.installed:
     - pkgs:
@@ -12,6 +16,7 @@ rails package dependencies:
 rails gem dependencies:
   cmd.wait:
     - name: bundle install
-    - cwd: /vagrant
+    - cwd: {{perfci.work_dir}}
     - watch:
       - pkg: rails package dependencies
+

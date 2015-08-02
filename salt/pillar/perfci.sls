@@ -1,0 +1,8 @@
+perfci:
+  env:
+    DB_HOST: '192.168.69.20'
+    REDIS_HOST: '192.168.69.20'
+    SERVER_HOST: '192.168.69.30'
+    GITHUB_ID: 'e25ce854ac3bd4d21641'
+    GITHUB_SECRET: 'aec6e45fbed7a749203ebb52b33aaa08bf7c9073'
+    WEBHOOK_URL: 'https://8f4a3d84.ngrok.io'
