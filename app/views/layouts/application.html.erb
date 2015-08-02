@@ -77,7 +77,7 @@
                         <li class="active">
                             <a href="#"><i class="fa fa-files-o fa-fw"></i> Repositories<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
-                            <% current_user.repositories.order('name').each do |repo| %>
+                            <% current_user.repositories.order('full_name').each do |repo| %>
                                 <li>
                                     <a href="/results_overview?repository_id=<%= repo.id%>"><%= icon_for_status(repo.status).html_safe %>&nbsp;&nbsp;<%= repo.full_name %></a>
                                 </li>

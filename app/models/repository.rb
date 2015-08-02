@@ -4,7 +4,15 @@ class Repository < ActiveRecord::Base
   has_many :endpoints
   has_many :builds
 
+  validates :full_name, presence: true
+  validates :url, presence: true, if: Proc.new { |r| r.repository_type == 'external'}
+
+  TYPES = %w(github gitlab external)
   STATUSES = %w(success failed warn error)
+
+  def needs_hook?
+    repository_type == 'github'
+  end
 
   def add_hook
     if existing_hook

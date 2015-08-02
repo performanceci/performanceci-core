@@ -1,23 +1,14 @@
+
 <%= form_for(@repository) do |f| %>
-  <% if @repository.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@repository.errors.count, "error") %> prohibited this repository from being saved:</h2>
+  <%= f.hidden_field :repository_type, value: 'external' %>
+  <div class="form-group">
 
-      <ul>
-      <% @repository.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
     <%= f.label :name %><br>
     <%= f.text_field :name %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :url %><br>
-    <%= f.text_area :url %>
+    <%= f.text_field :url %>
   </div>
   <div class="actions">
     <%= f.submit %>

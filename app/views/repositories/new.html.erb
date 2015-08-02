@@ -10,33 +10,74 @@
       <div class="col-lg-8">
 
         <div class="panel panel-default">
-            <div class="panel-heading">
-                Add Repository
-            </div>
-            <!-- /.panel-heading -->
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <tbody>
-                          <% @repositories.each do |repo| %>
-                          <tr>
-                              <td><%= repo.full_name %></td>
-                              <td>
-                                <% unless @current_repositories.any? { |r| r.github_id == repo.id } %>
-                                  <%= link_to 'Add',
-                                  repositories_path(:name => repo.name, :full_name => repo.full_name,
-                                    :github_id => repo.id),
-                                    :method => :post, :class => "btn btn-success btn-block" %>
-                                <% end %>
-                              </td>
-                          </tr>
-                          <% end %>
-                        </tbody>
-                    </table>
+          <div class="panel-heading">
+              Add Repository
+          </div>
+            <ul class="nav nav-pills">
+                <li class="active"><a href="#github" data-toggle="tab">Github</a>
+                </li>
+                <li><a href="#external" data-toggle="tab">External</a>
+                </li>
+            </ul>
+
+            <% if @repository.errors.any? %>
+              <div id="error_explanation" class="alert alert-danger" >
+                <%= pluralize(@repository.errors.count, "error") %> prohibited this repository from being saved:
+
+                <ul>
+                <% @repository.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+
+            <div class="tab-content">
+              <div class="tab-pane fade in active" id="github">
+
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <tbody>
+                              <% @repositories.each do |repo| %>
+                              <tr>
+                                  <td><%= repo.full_name %></td>
+                                  <td>
+                                    <% unless @current_repositories.any? { |r| r.github_id == repo.id } %>
+                                      <%= link_to 'Add',
+                                      repositories_path(repository: {
+                                        name: repo.name, full_name: repo.full_name,
+                                        repositor_type: :github,
+                                        github_id: repo.id}),
+                                        method: :post, class: "btn btn-success btn-block" %>
+                                    <% end %>
+                                  </td>
+                              </tr>
+                              <% end %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
                 </div>
-                <!-- /.table-responsive -->
+                <!-- /.panel-body -->
+              </div>
+              <div class="tab-pane fade" id="external">
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-lg-6">
+
+                      <h4>External Repository</h4>
+                      <p>
+                        <%= render 'form' %>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <!-- /.panel-body -->
+          </div>
         </div>
       </div>
   </div>
