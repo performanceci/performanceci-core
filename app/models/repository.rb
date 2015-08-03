@@ -1,3 +1,5 @@
+require 'uri'
+
 class Repository < ActiveRecord::Base
   belongs_to :user
 
@@ -7,7 +9,8 @@ class Repository < ActiveRecord::Base
   validates :full_name, presence: true
   validates :url, presence: true, if: Proc.new { |r| r.is_external? }
   validates :config, presence: true, if: Proc.new { |r| r.is_external? }
-  validate :validate_json
+  validate :config_json_validation
+  validate :url_validation
 
   TYPES = %w(github gitlab external)
   STATUSES = %w(success failed warn error)
@@ -20,11 +23,19 @@ class Repository < ActiveRecord::Base
     repository_type == 'external'
   end
 
-  def validate_json
+  def config_json_validation
     if is_external? && config.present?
       json = JSON.parse(config) rescue nil
       errors.add(:config, 'Is not valid JSON') unless json
     end
+  end
+
+  def url_validation
+    return if url.blank? || !is_external?
+    uri = URI.parse(url)
+    errors.add(:url, 'Is not a valid URL') unless uri.kind_of?(URI::HTTP)
+  rescue URI::InvalidURIError
+    errors.add(:url, 'Is not a valid URL')
   end
 
   def add_hook
