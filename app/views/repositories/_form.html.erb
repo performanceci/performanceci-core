@@ -1,25 +1,51 @@
+
+<link href="/css/jsoneditor.min.css" rel="stylesheet" type="text/css">
+<script src="/js/jsoneditor.min.js"></script>
+
+
+
 <%= form_for(@repository) do |f| %>
-  <% if @repository.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@repository.errors.count, "error") %> prohibited this repository from being saved:</h2>
-
-      <ul>
-      <% @repository.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
+  <%= f.hidden_field :repository_type, value: 'external' %>
+  <%= f.hidden_field :config, id: 'config' %>
+  <div class="form-group">
     <%= f.label :name %><br>
     <%= f.text_field :name %>
   </div>
-  <div class="field">
+  <div class="form-group">
     <%= f.label :url %><br>
-    <%= f.text_area :url %>
+    <%= f.text_field :url, style: 'width: 400px' %>
   </div>
+
+  <div class="form-group">
+    <%= f.label 'config' %><br>
+    <div id="jsoneditor" style="width: 400px; height: 300px;"></div>
+  </div>
+
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit onclick: "$('#config').val(JSON.stringify(editor.get())); $('#new_repository').submit();".html_safe %>
   </div>
 <% end %>
+
+<script>
+    // create the editor
+    var container = document.getElementById("jsoneditor");
+    var editor = new JSONEditor(container, {'mode': 'code'});
+
+    var defaultJson = {
+      'endpoints': [
+        {
+          "name": 'Homepage',
+          'uri': '/',
+          'max_response_time': 0.09,
+          'target_response_time': 0.05,
+          'concurrency': 2,
+          'duration': 3
+        }
+      ]
+    };
+
+    // set json
+    var json = <%= @repository.config ? "JSON.parse(\"#{escape_javascript @repository.config}\");".html_safe : "defaultJson;" %>
+    editor.set(json);
+</script>
+

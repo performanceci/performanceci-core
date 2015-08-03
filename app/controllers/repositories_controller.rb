@@ -29,8 +29,8 @@ class RepositoriesController < ApplicationController
 
   # GET /repositories/new
   def new
-    @repositories = current_user.github_client.repos
-    @current_repositories = current_user.repositories
+    load_repos
+    @repository = Repository.new
   end
 
   # GET /repositories/1/edit
@@ -40,18 +40,14 @@ class RepositoriesController < ApplicationController
   # POST /repositories
   # POST /repositories.json
   def create
-    @repository = Repository.new(name: params[:name], full_name: params[:full_name],
-      :github_id => params[:github_id], user: current_user)
-
-    respond_to do |format|
-      if @repository.save
-        @repository.add_hook
-        format.html { redirect_to results_overview_index_path, notice: 'Repository was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @repository }
-      else
-        format.html { render action: 'new' }
-        format.json { render json: @repository.errors, status: :unprocessable_entity }
-      end
+    @repository = Repository.new(repository_params.merge(user: current_user))
+    @repository.full_name ||= @repository.name
+    if @repository.save
+      @repository.add_hook if @repository.needs_hook?
+      redirect_to results_overview_index_path(repository_id: @repository.id), notice: 'Repository was successfully created.'
+    else
+      load_repos
+      render 'new'
     end
   end
 
@@ -80,6 +76,12 @@ class RepositoriesController < ApplicationController
   end
 
   private
+
+    def load_repos
+      @repositories = current_user.github_client.repos
+      @current_repositories = current_user.repositories
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_repository
       @repository = Repository.find(params[:id])
@@ -87,7 +89,7 @@ class RepositoriesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def repository_params
-      params.permit(:name, :url)
+      params.require(:repository).permit(:name, :full_name, :url, :repository_type, :github_id, :config)
     end
 
 end
