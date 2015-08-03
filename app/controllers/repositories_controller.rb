@@ -47,7 +47,7 @@ class RepositoriesController < ApplicationController
       redirect_to results_overview_index_path(repository_id: @repository.id), notice: 'Repository was successfully created.'
     else
       load_repos
-      render action: 'new'
+      render 'new'
     end
   end
 
@@ -89,7 +89,7 @@ class RepositoriesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def repository_params
-      params.require(:repository).permit(:name, :full_name, :url, :repository_type, :github_id)
+      params.require(:repository).permit(:name, :full_name, :url, :repository_type, :github_id, :config)
     end
 
 end

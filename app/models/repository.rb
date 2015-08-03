@@ -5,13 +5,26 @@ class Repository < ActiveRecord::Base
   has_many :builds
 
   validates :full_name, presence: true
-  validates :url, presence: true, if: Proc.new { |r| r.repository_type == 'external'}
+  validates :url, presence: true, if: Proc.new { |r| r.is_external? }
+  validates :config, presence: true, if: Proc.new { |r| r.is_external? }
+  validate :validate_json
 
   TYPES = %w(github gitlab external)
   STATUSES = %w(success failed warn error)
 
   def needs_hook?
     repository_type == 'github'
+  end
+
+  def is_external?
+    repository_type == 'external'
+  end
+
+  def validate_json
+    if is_external? && config.present?
+      json = JSON.parse(config) rescue nil
+      errors.add(:config, 'Is not valid JSON') unless json
+    end
   end
 
   def add_hook
