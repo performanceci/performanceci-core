@@ -60,10 +60,6 @@ class ProjectConfiguration
     end
     port = config_hash['port']
     puts config_hash.to_json
-    unless port
-      errors << "Please specify a single 'port' to export"
-      return false
-    end
     @configuration = {
       endpoints: endpoints,
       port: port
