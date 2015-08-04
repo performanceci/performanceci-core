@@ -18,7 +18,8 @@ class OrchestrationWorker < Worker
     begin
       if build.repository.is_external?
         update_status(build, :preparing_target, 1)
-        test_configuration = ProjectConfiguration.new(build.repository.config)
+        parsed_conf = HashUtil.symbolize_keys(JSON.parse(build.repository.config))
+        test_configuration = ProjectConfiguration.new(parsed_conf)
         build_results.test_configuration = test_configuration
         unless test_configuration.valid?
           execution_error(build_results, test_configuration.errors)

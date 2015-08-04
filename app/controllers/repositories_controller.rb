@@ -18,7 +18,11 @@ class RepositoriesController < ApplicationController
 
   def build_latest
     @repository = current_user.repositories.find(params[:id])
-    build = @repository.build_from_last_commit
+    if @repository.is_external?
+      build = @repository.build_external
+    else
+      build = @repository.build_from_last_commit
+    end
     render json: build
   end
 
