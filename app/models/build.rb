@@ -114,6 +114,8 @@ class Build < ActiveRecord::Base
     case (status || '').to_sym
     when :cloning
       "Cloning Code"
+    when :preparing_target
+      "Remote Target Preparations"
     when :pending
       "Waiting to Build"
     when :building_container
