@@ -67,6 +67,11 @@ class Repository < ActiveRecord::Base
       hook_options)
   end
 
+  def build_external
+    build = Build.create!(url: self.url, repository: self)
+    build.run_build
+  end
+
   def build_from_last_commit
     commits = user.github_client.commits(full_name)
     last_commit = commits[0]
