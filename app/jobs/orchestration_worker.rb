@@ -13,32 +13,45 @@ class OrchestrationWorker < Worker
     project_checkout = nil
     load_tester = nil
     is_remote = options[:is_remote]
+    build_results = BuildResult.new(build)
 
     begin
-      update_status(build, :cloning, 1)
-      build_results = BuildResult.new(build)
-      project_checkout = project_fetcher(build, is_remote)
-      unless project_checkout.retrieve
-        execution_error(build_results, project_checkout.errors)
-      end
-      project_src = project_checkout.source_dir
+      if build.repository.is_external?
+        update_status(build, :preparing_target, 1)
+        test_configuration = ProjectConfiguration.new(build.repository.config)
+        build_results.test_configuration = test_configuration
+        unless test_configuration.valid?
+          execution_error(build_results, test_configuration.errors)
+        end
+      else
+        update_status(build, :cloning, 1)
+        project_checkout = project_fetcher(build, is_remote)
+        unless project_checkout.retrieve
+          execution_error(build_results, project_checkout.errors)
+        end
+        project_src = project_checkout.source_dir
 
-      test_configuration = ProjectConfiguration.from_build_dir(project_src)
-      build_results.test_configuration = test_configuration
-      unless test_configuration.valid?
-        execution_error(build_results, test_configuration.errors)
-      end
+        test_configuration = ProjectConfiguration.from_build_dir(project_src)
+        build_results.test_configuration = test_configuration
+        unless test_configuration.valid?
+          execution_error(build_results, test_configuration.errors)
+        end
 
-      update_status(build, :building_container, 2)
+        update_status(build, :building_container, 2)
 
-      paas = paas_for_build(build, project_src, test_configuration)
-      unless paas.build
-        execution_error(build_results, paas.errors)
+        paas = paas_for_build(build, project_src, test_configuration)
+        unless paas.build
+          execution_error(build_results, paas.errors)
+        end
       end
 
       update_status(build, :attacking_container, 3)
 
-      load_tester = HttpLoadTester.new(paas_configuration(paas), test_configuration)
+      if build.repository.is_external?
+        load_tester = HttpLoadTester.new({base_url: build.repository.url}, test_configuration)
+      else
+        load_tester = HttpLoadTester.new(paas_configuration(paas), test_configuration)
+      end
       if load_tester.run
         build_results.test_results = load_tester.test_results
 
