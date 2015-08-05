@@ -5,9 +5,6 @@ class WebhooksController < ApplicationController
   def hook
     build = Build.from_payload(params)
     build.save!
-    if ENV['GENERATE_DATA']
-      build.generate_fake_data(10)
-    end
     build.run_build
     render :text => 'OK', :status => 200
   end

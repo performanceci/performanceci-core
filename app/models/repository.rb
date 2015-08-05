@@ -78,7 +78,7 @@ class Repository < ActiveRecord::Base
     previous_commit = commits[1]
     previous_sha = previous_commit.sha
     last_sha = last_commit.sha
-    compare = "https://github.com/akira/testhook/compare/#{previous_sha[0..11]}...#{last_sha[0..11]}"
+    compare = "https://github.com/#{full_name}/compare/#{previous_sha[0..11]}...#{last_sha[0..11]}"
     if last_commit && previous_commit
       build = Build.create!(
         payload: '{}',
@@ -87,7 +87,7 @@ class Repository < ActiveRecord::Base
         after: last_sha,
         message: last_commit.commit.message,
         compare: compare,
-        url: "https://github.com/#{self.full_name}.git",
+        url: "https://github.com/#{full_name}.git",
         repository: self)
       build.run_build
     end

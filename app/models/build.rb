@@ -96,20 +96,6 @@ class Build < ActiveRecord::Base
       build: self)
   end
 
-  def generate_fake_data(n)
-    (1..n).each do |i|
-      endpoint = add_endpoint("http://localhost:3000/api/endpoint#{i}", {})
-      data, score, avg_resp = fake_benchmarks(10)
-      endpoint_benchmark(endpoint, avg_resp, score, data)
-    end
-    mark_build_finished
-  end
-
-  def fake_benchmarks(n)
-    data = (1..n).map { rand(1000) }
-    [data, rand(11), data.inject(:+) / n.to_f]
-  end
-
   def self.message_for_status(status)
     case (status || '').to_sym
     when :cloning
