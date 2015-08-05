@@ -10,7 +10,15 @@ class Build < ActiveRecord::Base
 
   #TODO: Fill this out
   def provider
-    :docker
+    if is_external?
+      :external
+    else
+      :docker
+    end
+  end
+
+  def is_external?
+    repository.is_external?
   end
 
   def self.from_payload(payload)

@@ -14,8 +14,12 @@ class GitCheckout
     g.checkout(commit_hash) if commit_hash
     true
   rescue Exception => e
-    errors << e.to_s
+    errors << e.to_s + "\n#{e.backtrace}"
     false
+  end
+
+  def project_configuration
+    ProjectConfiguration.from_build_dir(source_dir)
   end
 
   def source_dir

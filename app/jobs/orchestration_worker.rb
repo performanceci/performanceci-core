@@ -16,43 +16,31 @@ class OrchestrationWorker < Worker
     build_results = BuildResult.new(build)
 
     begin
-      if build.repository.is_external?
-        update_status(build, :preparing_target, 1)
-        parsed_conf = HashUtil.symbolize_keys(JSON.parse(build.repository.config))
-        test_configuration = ProjectConfiguration.new(parsed_conf)
-        build_results.test_configuration = test_configuration
-        unless test_configuration.valid?
-          execution_error(build_results, test_configuration.errors)
-        end
-      else
-        update_status(build, :cloning, 1)
-        project_checkout = project_fetcher(build, is_remote)
-        unless project_checkout.retrieve
-          execution_error(build_results, project_checkout.errors)
-        end
-        project_src = project_checkout.source_dir
+      update_status(build, :cloning, 1)
 
-        test_configuration = ProjectConfiguration.from_build_dir(project_src)
-        build_results.test_configuration = test_configuration
-        unless test_configuration.valid?
-          execution_error(build_results, test_configuration.errors)
-        end
+      project_checkout = project_fetcher(build, is_remote)
+      unless project_checkout.retrieve
+        execution_error(build_results, project_checkout.errors)
+      end
 
-        update_status(build, :building_container, 2)
 
-        paas = paas_for_build(build, project_src, test_configuration)
-        unless paas.build
-          execution_error(build_results, paas.errors)
-        end
+      build_results.test_configuration = project_checkout.project_configuration
+      unless build_results.test_configuration.valid?
+        execution_error(build_results, build_results.test_configuration.errors)
+      end
+
+
+      update_status(build, :building_container, 2)
+
+      project_src = project_checkout.source_dir
+      paas = paas_for_build(build, project_src, build_results.test_configuration)
+      unless paas.build
+        execution_error(build_results, paas.errors)
       end
 
       update_status(build, :attacking_container, 3)
+      load_tester = HttpLoadTester.new(paas_configuration(paas), build_results.test_configuration)
 
-      if build.repository.is_external?
-        load_tester = HttpLoadTester.new({base_url: build.repository.url}, test_configuration)
-      else
-        load_tester = HttpLoadTester.new(paas_configuration(paas), test_configuration)
-      end
       if load_tester.run
         build_results.test_results = load_tester.test_results
 
@@ -63,7 +51,7 @@ class OrchestrationWorker < Worker
         execution_error(build_results, load_tester.errors)
       end
     rescue Exception => e
-      execution_error(build_results, [e.to_s])
+      execution_error(build_results, [e.to_s + "\n#{e.backtrace}"])
     ensure
 
       project_checkout.cleanup rescue nil if project_checkout
@@ -79,8 +67,11 @@ class OrchestrationWorker < Worker
     build.update_status(status, step / total.to_f * 100)
   end
 
+  #TODO: we can probably move this and project_fetcher out to Build or another factory
   def paas_for_build(build, project_src, test_configuration)
-    if build.provider == :docker
+    if build.is_external?
+      paas = ExternalBuilder.new(build.url, test_configuration)
+    elsif build.provider == :docker
       paas = DockerBuilder.new(project_src, test_configuration)
     else
       provider = build.repository.provider
@@ -89,19 +80,16 @@ class OrchestrationWorker < Worker
   end
 
   def paas_configuration(paas)
-    # configuration to hand to load tester
-    if paas.is_a?(DockerBuilder)
-      {base_url: paas.base_test_url}
-    else
-      {base_url: paas.base_test_url}
-    end
+    {base_url: paas.base_test_url}
   end
 
   def project_fetcher(build, is_remote)
-    if is_remote
-      project_checkout = GitCheckout.new(build.repository.full_name, build.url, build.after)
+    if build.repository.is_external?
+      EmptyCheckout.new(build)
+    elsif is_remote
+      GitCheckout.new(build.repository.full_name, build.url, build.after)
     else
-      project_checkout = LocalCheckout.new(build.repository.full_name, build.url)
+      LocalCheckout.new(build.repository.full_name, build.url)
     end
   end
 
