@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/performanceci/performanceci-core.png?label=ready&title=Ready)](https://waffle.io/performanceci/performanceci-core)
 # PerformanceCI
 
 This is a project to add application performance testing into your continuous
