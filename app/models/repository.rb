@@ -12,6 +12,8 @@ class Repository < ActiveRecord::Base
   validate :config_json_validation
   validate :url_validation
 
+  before_create :set_build_token
+
   TYPES = %w(github gitlab external)
   STATUSES = %w(success failed warn error)
 
@@ -131,5 +133,9 @@ class Repository < ActiveRecord::Base
       events: ['pull_request', 'push'],
       active: true
     }
+  end
+
+  def set_build_token
+    self.build_token = SecureRandom.hex(8)[0..7]
   end
 end

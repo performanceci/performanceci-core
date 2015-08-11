@@ -51,11 +51,14 @@
             <div class="row">
                 <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)">
                     <div>
-                        <h3>Or to trigger manually: </h3>
+                        <h3>To trigger manually: </h3>
                         <div class="row col-lg-4">
                           <br />
                           <a href='#' class="btn btn-lg btn-success btn-block" ng-click="buildLatest(<%= @repository.id %>)">Build Latest</a>
+                          <% if @repository.is_external? %>
+                          <br /><p>Or <pre  style='width:800px'>curl -X PUT "http://<%= request.host_with_port%>/repositories/<%= @repository.id %>/build_latest?token=<%= @repository.build_token %>" -d ''</pre>
                           <br />
+                          <% end %>
                         </div>
                     </div>
                     <br />

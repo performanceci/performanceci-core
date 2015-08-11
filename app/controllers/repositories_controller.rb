@@ -1,5 +1,5 @@
 class RepositoriesController < ApplicationController
-  before_filter :authenticate_user!
+  before_filter :authenticate_user!, except: [:build_latest]
 
   protect_from_forgery except: [:build_latest]
   before_action :set_repository, only: [:show, :edit, :update, :destroy]
@@ -17,7 +17,15 @@ class RepositoriesController < ApplicationController
   end
 
   def build_latest
-    @repository = current_user.repositories.find(params[:id])
+    if user_signed_in?
+      @repository = current_user.repositories.find(params[:id])
+    else
+      @repository = Repository.find(params[:id])
+      if params[:token] != @repository.build_token
+        render status: 401, text: {error: 'token invalid'}
+        return
+      end
+    end
     if @repository.is_external?
       build = @repository.build_external
     else
