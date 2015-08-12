@@ -55,9 +55,11 @@
                         <div class="row col-lg-4">
                           <br />
                           <a href='#' class="btn btn-lg btn-success btn-block" ng-click="buildLatest(<%= @repository.id %>)">Build Latest</a>
+                        </div>
+                        <div class="row col-lg-10">
                           <% if @repository.is_external? %>
-                          <br /><p>Or <pre  style='width:800px'>curl -X PUT "http://<%= request.host_with_port%>/repositories/<%= @repository.id %>/build_latest?token=<%= @repository.build_token %>" -d ''</pre>
-                          <br />
+                        <h3>Or: </h3>
+                          <pre style='width:800px'>curl -X PUT "http://<%= request.host_with_port%>/repositories/<%= @repository.id %>/build_latest?token=<%= @repository.build_token %>" -d ''</pre>
                           <% end %>
                         </div>
                     </div>
@@ -65,7 +67,7 @@
                     <br />
 
                     <h3 class="page-header" ng-hide="!show_status">
-                    <div>
+                    <div class="row col-lg-10">
                         <p>
                             <strong>Build Status: {{build_status}}</strong>
                             <span class="pull-right text-muted">{{build_percent}}% Complete</span>
