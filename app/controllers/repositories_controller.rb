@@ -64,16 +64,11 @@ class RepositoriesController < ApplicationController
   end
 
   # PATCH/PUT /repositories/1
-  # PATCH/PUT /repositories/1.json
   def update
-    respond_to do |format|
-      if @repository.update(repository_params)
-        format.html { redirect_to @repository, notice: 'Repository was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @repository.errors, status: :unprocessable_entity }
-      end
+    if @repository.update(repository_params)
+      redirect_to results_overview_index_path(repository_id: @repository.id), notice: 'Repository was successfully updated.'
+    else
+      render 'edit'
     end
   end
 
@@ -81,10 +76,7 @@ class RepositoriesController < ApplicationController
   # DELETE /repositories/1.json
   def destroy
     @repository.destroy
-    respond_to do |format|
-      format.html { redirect_to repositories_url }
-      format.json { head :no_content }
-    end
+    redirect_to results_overview_index_path
   end
 
   private

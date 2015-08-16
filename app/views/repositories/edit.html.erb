@@ -1,6 +1,44 @@
-<h1>Editing repository</h1>
+<div id="page-wrapper">
+  <div class="row">
+      <div class="col-lg-12">
+          <h1 class="page-header">Dashboard</h1>
+      </div>
+      <!-- /.col-lg-12 -->
+  </div>
+  <!-- /.row -->
+  <div class="row">
+      <div class="col-lg-8">
 
-<%= render 'form' %>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+              Edit Repository
+          </div>
+            <% if @repository.errors.any? %>
+              <div id="error_explanation" class="alert alert-danger" >
+                <%= pluralize(@repository.errors.count, "error") %> prohibited this repository from being saved:
 
-<%= link_to 'Show', @repository %> |
-<%= link_to 'Back', repositories_path %>
+                <ul>
+                <% @repository.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-lg-6">
+
+                  <h4>External Repository</h4>
+                  <p>
+                    <%= render 'form' %>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+  </div>
+</div>

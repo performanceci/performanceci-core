@@ -1,0 +1,21 @@
+<!-- Modal -->
+<div class="modal fade" class='width: 900px;' id="externalModal" tabindex="-1" role="dialog" aria-labelledby="External Configuration">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Webhook Information</h4>
+      </div>
+      <div class="modal-body">
+          <div>
+              <h3>To trigger build: </h3>
+                <pre style='width:800px'>curl -X PUT "http://<%= request.host_with_port%>/repositories/<%= @repository.id %>/build_latest?token=<%= @repository.build_token %>" -d ''</pre>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>

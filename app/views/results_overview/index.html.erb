@@ -1,178 +1,185 @@
 
-		<div id="page-wrapper" ng-app="resultsOverviewControllers">
-            <div class="row">
-                <div class="col-lg-10">
-                    <% if @repository %>
-                    <h2 class="page-header">Repository: <%= @repository.full_name%>
-                    </h2>
-                    <% else %>
-                        <h2 class="page-header">No Repos
-                        </h2>
-                        <div class="row col-lg-4">
-                            <%= link_to 'Add Repository', new_repository_path, :class => "btn btn-lg btn-success btn-block" %>
-                        </div>
-
-                    <% end %>
-                    <% if @build %>
-                        <div class="panel <%= build_panel_css%>">
-                            <div class="panel-heading">
-                                <p><%=@build.build_status_message %></p>
-                            </div>
-                            <div class="panel-body">
-                                <% if @build.build_status == 'error' %>
-                                    <% if @build.error_message %>
-                                        <div style='font-size:11px;font-style:courier;'>Build Error: <%=@build.error_message.gsub("\n", "<br />").gsub('",', "<br />").html_safe if @build.error_message %></div>
-                                    <% end %>
-                                <% else %>
-                                    <table>
-                                        <tr>
-                                            <td style='width:180px'><h4>Average Response:</h4></td>
-                                            <td style='width:130px'><h4><%= format_response_time @build.average_response %> ms</h4></td>
-                                        </tr>
-                                        <tr>
-                                            <td><h4>Trend:</h4></td>
-                                            <td><h4><%= thumbs(format_percent(@build.percent_change)).html_safe %></h4></td>
-                                        </tr>
-                                        <tr>
-                                            <td><h4>Total Endpoints:</h4></td>
-                                            <td><h4><%=@build.build_endpoints.count %></h4></td>
-                                        </tr>
-                                    </table>
-                                <% end %>
-                            </div>
-                        </div>
-                    <% elsif @repository %>
-                      <h3>Repository is ready to go! <br /><br />Push some new commits and we'll get going...</h3>
-                    <% end %>
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
+<div id="page-wrapper" ng-app="resultsOverviewControllers"<% if @repository %>ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)" <% end %> >
+    <div class="row">
+        <div class="col-lg-10">
             <% if @repository %>
-            <div class="row">
-                <div class="col-lg-10" ng-controller="BuildStatusCtrl" ng-init="init('/builds/ongoing.json', <%= @repository.id%>)">
-                    <div>
-                        <h3>To trigger manually: </h3>
-                        <div class="row col-lg-4">
-                          <br />
-                          <a href='#' class="btn btn-lg btn-success btn-block" ng-click="buildLatest(<%= @repository.id %>)">Build Latest</a>
-                        </div>
-                        <div class="row col-lg-10">
-                          <% if @repository.is_external? %>
-                        <h3>Or: </h3>
-                          <pre style='width:800px'>curl -X PUT "http://<%= request.host_with_port%>/repositories/<%= @repository.id %>/build_latest?token=<%= @repository.build_token %>" -d ''</pre>
-                          <% end %>
-                        </div>
-                    </div>
-                    <br />
-                    <br />
-
-                    <h3 class="page-header" ng-hide="!show_status">
-                    <div class="row col-lg-10">
-                        <p>
-                            <strong>Build Status: {{build_status}}</strong>
-                            <span class="pull-right text-muted">{{build_percent}}% Complete</span>
-                        </p>
-                        <div class="progress progress-striped active">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: {{build_percent}}%">
-                                <span class="sr-only">{{build_percent}}% Complete (success)</span>
+                <h2 class="page-header">Repository: <%= @repository.full_name%>
+                    <% if @repository %>
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">Actions
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a href='#' ng-click="buildLatest(<%= @repository.id %>)">Build Latest</a></li>
+                                    <% if @repository.is_external? %>
+                                        <li><a href='' data-toggle="modal" data-target="#externalModal">Webook Information</a></li>
+                                        <li><%= link_to 'Edit Repository', edit_repository_path(@repository) %></li>
+                                    <% end %>
+                                    <li><%= link_to 'Delete Repository', @repository, method: :delete, confirm: 'Are you sure?'%></li>
+                                </ul>
                             </div>
                         </div>
-                    </div>
-                    </h3>
+                    <% end %>
+                </h2>
+            <% else %>
+                <h2 class="page-header">No Repos</h2>
+                <div class="row col-lg-4">
+                    <%= link_to 'Add Repository', new_repository_path, :class => "btn btn-lg btn-success btn-block" %>
                 </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <!-- /.row -->
-            <div ng-controller="TestResultCtrl">
-                <div ng-init="init('/repositories/<%= @repository.id%>/summary.json')"></div>
-
-                <div class="row" ng-repeat="endpointdata in repodata">
-                    <div class="col-lg-10" >
-                        <div class="panel panel-default">
-                            <div class="panel-heading" >
-                                <i class="fa fa-bar-chart-o fa-fw"></i> Endpoint:{{endpointdata.endpoint.url}} response
-                                <div class="pull-right">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                            Chart
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu pull-right" role="menu">
-                                            <li><a href="#">Response time</a>
-                                            </li>
-                                            <li><a href="#">% Change</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- /.panel-heading -->
-                            <div class="panel-body">
-                            	<linechart data="endpointdata"></linechart>
-                            </div>
-                            <!-- /.panel-body -->
-
-                        </div>
+            <% end %>
+            <% if @build %>
+                <div class="panel <%= build_panel_css%>">
+                    <div class="panel-heading">
+                        <p><%=@build.build_status_message %></p>
                     </div>
-                    <!-- /.col-lg-10 -->
-                    <div class="col-lg-2">
-                        <!-- Start here -->
-                        <div class=" panel panel-default">
-                            <div class="panel-heading">
-                                <i class="fa fa-plus-square fa-fw"></i>
-                                Trend
-                            </div>
-                            <!-- /.panel-heading -->
-                            <div class="panel-body">
-                                <ul class="chat">
-                                    <li class="left clearfix" style="border-bottom: 1px" ng-show="isTrendGood(endpointdata)">
-                                        <span class="chat-img pull-left">
-                                            <i class="fa fa-thumbs-o-up fa-3x fa-fw" style="color:green"></i>
-                                        </span>
-                                        <div class="chat-body clearfix">
-                                            <div class="header">
-                                                <small class="pull-right text-muted">
-                                                    <i class="fa fa-clock-o fa-fw"></i> {{lastBuildMin(endpointdata)}}
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <p>
-                                        Page or API endpoint response time is improving
-                                        </p>
+                    <div class="panel-body">
+                        <% if @build.build_status == 'error' %>
+                            <% if @build.error_message %>
+                                <div style='font-size:11px;font-style:courier;'>Build Error: <%=@build.error_message.gsub("\n", "<br />").gsub('",', "<br />").html_safe if @build.error_message %></div>
+                            <% end %>
+                        <% else %>
+                            <table>
+                                <tr>
+                                    <td style='width:180px'><h4>Average Response:</h4></td>
+                                    <td style='width:130px'><h4><%= format_response_time @build.average_response %> ms</h4></td>
+                                </tr>
+                                <tr>
+                                    <td><h4>Trend:</h4></td>
+                                    <td><h4><%= thumbs(format_percent(@build.percent_change)).html_safe %></h4></td>
+                                </tr>
+                                <tr>
+                                    <td><h4>Total Endpoints:</h4></td>
+                                    <td><h4><%=@build.build_endpoints.count %></h4></td>
+                                </tr>
+                            </table>
+                        <% end %>
+                    </div>
+                </div>
+            <% elsif @repository %>
+                <h3>Repository is ready to go! <br /><br /><% unless @repository.is_external? %>Push some new commits and we'll get going...<% end %></h3>
+                <div class="row col-lg-4">
+                  <br />
+                  <a href='#' class="btn btn-lg btn-success btn-block" ng-click="buildLatest(<%= @repository.id %>)">Build Latest</a>
+                </div>
+
+            <% end %>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <% if @repository %>
+    <div class="row">
+        <div class="col-lg-10">
+            <h3 class="page-header" ng-hide="!show_status">
+            <div class="row col-lg-10">
+                <p>
+                    <strong>Build Status: {{build_status}}</strong>
+                    <span class="pull-right text-muted">{{build_percent}}% Complete</span>
+                </p>
+                <div class="progress progress-striped active">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: {{build_percent}}%">
+                        <span class="sr-only">{{build_percent}}% Complete (success)</span>
+                    </div>
+                </div>
+            </div>
+            </h3>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div ng-controller="TestResultCtrl">
+        <div ng-init="init('/repositories/<%= @repository.id%>/summary.json')"></div>
+
+        <div class="row" ng-repeat="endpointdata in repodata">
+            <div class="col-lg-10" >
+                <div class="panel panel-default">
+                    <div class="panel-heading" >
+                        <i class="fa fa-bar-chart-o fa-fw"></i> Endpoint:{{endpointdata.endpoint.url}} response
+                        <div class="pull-right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                    Chart
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a href="#">Response time</a>
                                     </li>
-                                    <li class="right clearfix" style="border-bottom: 1px" ng-hide="isTrendGood(endpointdata)">
-                                        <span class="chat-img pull-right">
-                                            <i class="fa fa-thumbs-o-down fa-3x fa-fw" style="color:red"></i>
-                                        </span>
-                                        <div class="chat-body clearfix">
-                                            <div class="header">
-                                                <small class="pull-left text-muted">
-                                                    <i class="fa fa-clock-o fa-fw"></i> {{lastBuildMin(endpointdata)}}
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <p>
-                                        Page or API endpoint <strong>response time is degrading</strong>
-                                        </p>
+                                    <li><a href="#">% Change</a>
                                     </li>
                                 </ul>
                             </div>
-                            <!-- /.panel-body -->
-                            <div class="panel-footer">
-                            </div>
-                            <!-- /.panel-footer -->
                         </div>
-                        <!-- Stop here -->
                     </div>
-                    <!-- /.col-lg-10 -->
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                    	<linechart data="endpointdata"></linechart>
+                    </div>
+                    <!-- /.panel-body -->
+
                 </div>
-                <!-- Container div -->
             </div>
-            <!-- /.row -->
-            <% end %>
+            <!-- /.col-lg-10 -->
+            <div class="col-lg-2">
+                <!-- Start here -->
+                <div class=" panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-plus-square fa-fw"></i>
+                        Trend
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <ul class="chat">
+                            <li class="left clearfix" style="border-bottom: 1px" ng-show="isTrendGood(endpointdata)">
+                                <span class="chat-img pull-left">
+                                    <i class="fa fa-thumbs-o-up fa-3x fa-fw" style="color:green"></i>
+                                </span>
+                                <div class="chat-body clearfix">
+                                    <div class="header">
+                                        <small class="pull-right text-muted">
+                                            <i class="fa fa-clock-o fa-fw"></i> {{lastBuildMin(endpointdata)}}
+                                        </small>
+                                    </div>
+                                </div>
+                                <p>
+                                Page or API endpoint response time is improving
+                                </p>
+                            </li>
+                            <li class="right clearfix" style="border-bottom: 1px" ng-hide="isTrendGood(endpointdata)">
+                                <span class="chat-img pull-right">
+                                    <i class="fa fa-thumbs-o-down fa-3x fa-fw" style="color:red"></i>
+                                </span>
+                                <div class="chat-body clearfix">
+                                    <div class="header">
+                                        <small class="pull-left text-muted">
+                                            <i class="fa fa-clock-o fa-fw"></i> {{lastBuildMin(endpointdata)}}
+                                        </small>
+                                    </div>
+                                </div>
+                                <p>
+                                Page or API endpoint <strong>response time is degrading</strong>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.panel-body -->
+                    <div class="panel-footer">
+                    </div>
+                    <!-- /.panel-footer -->
+                </div>
+                <!-- Stop here -->
+            </div>
+            <!-- /.col-lg-10 -->
         </div>
-        <!-- /#page-wrapper -->
-        <!-- Page-Level Demo Scripts - Blank - Use for reference -->
-        <script src="/src/app/results-overview/controllers.js"></script>
-        <script src="/src/app/results-overview/services.js"></script>
-        <script src="/src/app/results-overview/directives.js"></script>
+        <!-- Container div -->
+    </div>
+    <!-- /.row -->
+    <% end %>
+</div>
+<% if @repository && @repository.is_external? %>
+    <%= render 'external_modal' %>
+<% end %>
+<!-- /#page-wrapper -->
+<!-- Page-Level Demo Scripts - Blank - Use for reference -->
+<script src="/src/app/results-overview/controllers.js"></script>
+<script src="/src/app/results-overview/services.js"></script>
+<script src="/src/app/results-overview/directives.js"></script>
