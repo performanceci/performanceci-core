@@ -45,9 +45,11 @@ class VegetaDriver
     )
   end
 
-  def run_test(endpoint, rate, duration)
+  def run_test(test_data)
     pull_image unless image
-    create_container(@base_url + endpoint, duration, rate)
+    # TODO: You can acess test_data[:body], test_data[:body], test_data[:headers].
+    # TODO: Maybe pass test_data to container create
+    create_container(@base_url + test_data[:uri], test_data[:duration], test_data[:concurrency])
     puts "VegetaDriver: Starting Benchmark Container [#{container.id}]"
     container.start
     container.wait

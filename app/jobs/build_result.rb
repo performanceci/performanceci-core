@@ -15,11 +15,8 @@ class BuildResult
     puts "SAVING #{@results.to_json}"
     if errors.empty?
       @results.each do |endpoint_attribs|
-        attribs = endpoint_attribs.clone
+        attribs = endpoint_attribs.reject { |attrib, _| [:body, :method, :headers, :results, :uri].include?(attrib) }
         results = endpoint_attribs[:results]
-        attribs.delete(:results)
-        attribs.delete(:uri)
-        attribs.delete(:headers)
         endpoint = build.add_endpoint(endpoint_attribs[:uri], endpoint_attribs[:headers], attribs)
         build.endpoint_benchmark(endpoint, results[:latencies][:mean] / 1_000_000_000.to_f, 0, results)
       end
