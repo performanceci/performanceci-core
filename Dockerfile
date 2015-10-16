@@ -1,10 +1,13 @@
-FROM promptworks/ruby-2.0.0
-RUN yum install -y sqlite-devel gcc-c++
-ADD . /data/
-WORKDIR /data/
+FROM library/rails:4.2.4
+MAINTAINER Charles Darwin "darwin@senet.us"
+
+RUN mkdir -p /usr/src/app
+RUN bundle config --global frozen 1
+WORKDIR /usr/src/app
+COPY Gemfile /usr/src/app/
+COPY Gemfile.lock /usr/src/app/
 RUN bundle install
-EXPOSE 4567
-ENV RAILS_ENV production
-RUN bundle exec rake db:migrate
-#RUN bundle exec rake db:seed_perf
-CMD ["bundle", "exec", "rails", "s", "-p", "4567"]
+
+COPY . /usr/src/app
+
+CMD ["bundle", "exec", "rake", "about"]
