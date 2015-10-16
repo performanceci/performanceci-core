@@ -1,0 +1,37 @@
+postgres-service:
+  image: 'library/postgres:9.4.5'
+  container_name: 'postgres-999-99-service'
+  env_file: '.env'
+redis-service:
+  image: 'library/redis:3.0.4'
+  container_name: 'redis-999-99-service'
+perfci-core:
+  build: .
+  container_name: 'perfci-999-99-service'
+  command: 'bundle exec uwsgi'
+  links:
+    - 'postgres-service:postgres'
+    - 'redis-service:redis'
+  expose:
+    - '3000'
+  env_file: '.env'
+perfci-worker:
+  build: .
+  container_name: 'perfci-999-99-worker'
+  command: 'bundle exec rake resque:work'
+  volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+  links:
+    - 'postgres-service:postgres'
+    - 'redis-service:redis'
+  env_file: '.env'
+nginx-proxy:
+  image: 'library/nginx:1.9.5'
+  container_name: 'nginx-999-99-proxy'
+  volumes:
+    - './nginx.conf:/etc/nginx/conf.d/default.conf:ro'
+  links:
+    - 'perfci-core:perfci'
+  ports:
+    - '80:80'
+    - '443:443'
