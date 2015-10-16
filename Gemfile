@@ -78,7 +78,10 @@ end
 
 
 # Use unicorn as the app server
-gem 'unicorn'
+# gem 'unicorn'
+
+# Use uwsgi as the application server
+gem 'uwsgi'
 
 # Use Capistrano for deployment
 # gem 'capistrano', group: :development
