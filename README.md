@@ -5,119 +5,68 @@ This is a project to add application performance testing into your continuous
 delivery pipeline. We built this over a hackathon weekend and decided to release
 it to the public as open source.
 
+## Stack
+
+The main web UI is provided by [NGiNX](http://nginx.org) for serving static
+content and routing requests to [uwsgi](http://uwsgi-docs.readthedocs.org/en/latest/#)
+as the process manager and application server to a [Ruby on Rails](http://rubyonrails.org)
+web framework backed by [PostgreSQL](http://www.postgresql.org) relational
+database and [redis](http://redis.io) in-memory data store. Task workers are
+provided by [resque](https://github.com/resque/resque) which generally tend
+to interact with a [Docker API](https://github.com/swipely/docker-api).
+Performance tests are currently provided by [vegeta](https://github.com/tsenart/vegeta)
+
 ## Development
-
-### Salt
-
-We are providing some example salt states to help manage a development
-environment. The environment provided is a standalone/masterless setup for
-simplicity. This has lead to a convention of salt formula dependency management
-via git subtrees/remotes. While this requires a bit of extra effort from a new
-developer, we believe this overhead is acceptable.
-
-```bash
-luser@lolcathost:perfocmanceci-core $ git remote add docker-formula https://github.com/saltstack-formulas/docker-formula.git
-luser@lolcathost:perfocmanceci-core $ git subtree add --prefix salt/formulas/docker-formula docker-formula master --squash
-```
-
-### Vagrant
-
-We have attempted to provide a Vagrantfile meeting the minimum requirements to
-run the application[s] for demonstration and development purposes. After a
-developer has forked and/or cloned this repository from GitHub, she should be
-able to `vagrant up` and have nearly everything needed to begin testing
-and working.
 
 ### ngrok
 
 In order for you to test webhooks locally, you'll need a way for GitHub to
 reach your development application. We have found [ngrok](https://ngrok.com)
-to be a simple solution. You will want to run ngrok oh your host (not
-your development vagrant box). Point it at the IP address of your vagrant box
-and the default Rails WEBrick server port.
+to be a simple solution. You will want to run ngrok oh your host and point it
+at the IP address of your Docker VM. Our docker-compose setup includes an
+NGiNX proxy accepting requests on port 80. You might invoke ngrok like so:
 
 ```bash
-luser@lolcathost:~$ ~/Downloads/ngrok http 192.168.69.10:3000
+luser@lolcathost:~$ ngrok http $(docker-machine ip perfci):80
 ```
 
 ### GitHub OAuth
 
 You will need to [Register a new OAuth application](https://github.com/settings/applications/new)
-to generate a new Client ID and Client Secret. You will use these to set pillar
-data for your deployment.
+to generate a new Client ID and Client Secret. You will use these to set
+environment variable for development or production deployments.
 
-### Salt
+### Docker Compose
 
-We will use pillar data as the simplest source for setting the necessary
-environment variables to get your application up and running. For reference,
-the following environment variable will need to be set for you to successfully
-test the full suite.
+We currently rely on [Docker Compose](https://docs.docker.com/compose/) for
+quickly standing up a development environment. We have provided a
+[`docker-compose.yml`](docker-compose.yml) which should be driven by
+environment variables. We have provided a sample set of environment variables
+in a file, [`.env.example`](.env.example). You should copy this to `.env` and
+modify according to your environment.
+
+At minimum, you will need to set the following environment variables in your
+`.env` file specific to your environment based on the previous steps.
 
 ```shell
-WEBHOOL_URL
+WEBHOOK_URL
 GITHUB_ID
 GITHUB_SECRET
 ```
 
-We will expose these as pillar data in `salt/pillar/rails.sls` which you will
-find in this repository. The example we provide should look like this:
+At this point, you should be able to stand up a development stack with
+something like:
 
-```yaml
-rails:
-  github:
-    id: e25ce854ac3bd4d21641
-    secret: aec6e45fbed7a749203ebb52b33aaa08bf7c9073
-  webhook:
-    url: https://a3010de7.ngrok.io
+```shell
+luser@lolcathost:~$ docker-compose up
 ```
 
-Update those values with the ones as described above, `vagrant up`, and go get
-some coffee or tea.
+You may periodically want to run migrations on your database with something
+like this:
 
-Then just point your browser of choice at the ngrok URL you configured above.
-You may log into the service with your GitHub account.
-
-You will find log output in under the  `logs` directory.
-
-## Deployment
-
-Here is our current deployment stack
-
-### Ubuntu 14.04.2 LTS (Trusty Tahr)
-
-[Ubuntu](http://releases.ubuntu.com/trusty/)
-
-We have included some simple [salt states](salt/roots/) to ensure a development
-host includes the necessary dependencies. At this time, these may be considered
-a starting point for production deployments. These states currently assume
-a stack based on the latest Long Term Support Ubuntu (14.04.2).
-
-### Ruby on Rails
-
-[RoR](http://rubyonrails.org/)
-
-This is just a simple Ruby on Rails application.
-
-### Docker
-
-[Docker](https://www.docker.io/)
-
-The project relies on Docker to manage standing up the web applications to be
-tested.
-
-### Redis
-
-[Redis](http://redis.io/)
-
-The project current requires a Redis server running on the same host as the
-main rails application.
-
-### Resque
-
-[Resque](https://github.com/resque/resque)
-
-The project uses some resque workers to collect performance statistics on the
-applications to be tested.
+```shell
+luser@lolcathost:~$ docker exec perfci-999-99-service bundle exec rake db:migrate
+```
 
 ## License
 
