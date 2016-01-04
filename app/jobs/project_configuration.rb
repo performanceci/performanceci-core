@@ -4,6 +4,7 @@ class ProjectConfiguration
   DEFAULT_TARGET_RESP = 0.3
   DEFAULT_CONCURRENCY = 10
   DEFAULT_DURATION = 5
+  DEFAULT_METHOD = 'GET'
 
   attr_reader :errors, :configuration
 
@@ -52,6 +53,8 @@ class ProjectConfiguration
       {
         :uri => endpoint['uri'],
         :headers => endpoint['headers'] || {},
+        :body => endpoint['body'],
+        :method => endpoint['method'] || DEFAULT_METHOD,
         :max_response_time    => endpoint['max_response_time']    || DEFAULT_MAX_RESP,
         :target_response_time => endpoint['target_response_time'] || DEFAULT_TARGET_RESP,
         :concurrency => endpoint['concurrency'] || DEFAULT_CONCURRENCY,
